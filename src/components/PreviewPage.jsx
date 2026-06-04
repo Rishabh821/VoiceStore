@@ -172,10 +172,18 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
             {/* Gallery Grid of Actual Mini-Previews */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 pt-6">
               {CONCEPTS.map((concept) => (
-                <button
+                <div
                   key={concept.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleSelectConcept(concept)}
-                  className="group text-left rounded-2xl glass hover:bg-slate-900/50 border border-slate-800/80 hover:border-slate-700/80 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl active:scale-[0.98] cursor-pointer"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelectConcept(concept);
+                    }
+                  }}
+                  className="group text-left rounded-2xl glass hover:bg-slate-900/50 border border-slate-800/80 hover:border-slate-700/80 transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xl active:scale-[0.98] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 >
                   {/* Miniature HTML Live Web Preview Frame */}
                   <div className="h-44 w-full bg-[#080a14] border-b border-slate-900 flex items-center justify-center p-3 relative group-hover:bg-[#0b0e1d] transition-colors select-none overflow-hidden">
@@ -205,7 +213,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                       <ChevronRight className="w-3.5 h-3.5 transform transition-transform group-hover:translate-x-0.5 ml-0.5" />
                     </div>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
 
