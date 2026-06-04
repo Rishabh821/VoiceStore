@@ -9,9 +9,29 @@ import {
 export default function TemplateRenderer({ data, variant = 1 }) {
   const { 
     businessName, phone, hours, address, category, accentColor,
-    heroHeadline, heroSubheadline, aboutText, ctaText, whyChooseUs,
+    heroHeadline: rawHeroHeadline, 
+    heroSubheadline: rawHeroSubheadline, 
+    aboutText: rawAboutText, 
+    ctaText: rawCtaText, 
+    whyChooseUs: rawWhyChooseUs,
     services, testimonials, industryDetails
   } = data;
+
+  // Dynamically resolve copywriting based on variant conversion strategy (v1 to v5)
+  const variantKey = `v${variant}`;
+  const variantCopy = data.variantsCopy?.[variantKey] || {};
+
+  const heroHeadline = variantCopy.heroHeadline || rawHeroHeadline || "Premium Local Services";
+  const heroSubheadline = variantCopy.heroSubheadline || rawHeroSubheadline || "Dedicated quality and reliable support crafted exactly around your requirements.";
+  const aboutText = variantCopy.aboutText || rawAboutText || "We are a locally owned service committed to bringing you the highest standard of excellence.";
+  const ctaText = variantCopy.ctaText || rawCtaText || "Get In Touch";
+  const whyChooseUs = Array.isArray(variantCopy.whyChooseUs) ? variantCopy.whyChooseUs : rawWhyChooseUs || ["Experienced Professionals", "Customer-Centric Care", "100% Satisfaction Guarantee"];
+
+  // Form interactive state tracking
+  const [formSubmitted, setFormSubmitted] = React.useState(false);
+  const [bookingSubmitted, setBookingSubmitted] = React.useState(false);
+  const [selectedService, setSelectedService] = React.useState("");
+
 
   // Dynamic high-quality photography placeholder imagery (from Unsplash)
   const images = {
@@ -314,7 +334,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // INDUSTRY-SPECIFIC SECTIONS
   // ----------------------------------------------------
   const renderIndustrySections = () => {
-    // 1. Restaurant
+    // ----------------------------------------------------
+    // 1. RESTAURANT CATEGORY
+    // ----------------------------------------------------
     if (category === 'restaurant') {
       const items = industryDetails?.menuItems?.length > 0 ? industryDetails.menuItems : [
         { name: "Artisanal Brew & Organic Espresso", price: "$4.99", desc: "Crafted using custom hand-selected premium beans roasted weekly." },
@@ -325,66 +347,194 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Chef Marcus Vance", role: "Head Culinary Artist" }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Menu Highlights */}
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Popular Menu Highlights</h3>
-              <p className="text-xs opacity-70 mt-1">Savor our client-favorites prepared fresh daily.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {items.map((item, idx) => (
-                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start gap-4">
-                      <h4 className="font-bold text-sm leading-tight">{item.name}</h4>
-                      <span className={`text-xs font-bold ${theme.accentText} whitespace-nowrap`}>{item.price}</span>
+      // Variant 1: Trust-focused Local (badges, stars, local ticks)
+      if (variant === 1) {
+        return (
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="text-left border-l-4 border-amber-700 pl-3">
+                <span className="text-[9px] uppercase tracking-wider font-bold text-amber-700">Verified Guest Favorites</span>
+                <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Popular Menu Highlights</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {items.map((item, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-3 relative`}>
+                    <div className="flex justify-between items-start gap-2">
+                      <h4 className="font-bold text-xs sm:text-sm">{item.name}</h4>
+                      <span className={`text-xs font-bold ${theme.accentText} bg-amber-50 px-2 py-0.5 rounded`}>{item.price}</span>
                     </div>
-                    <p className="text-[11px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                    <div className="flex items-center gap-1 text-[9px] text-amber-500 font-bold pt-2 border-t border-slate-100">
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                      <span>4.9★ Local Favorite</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Chef Profile (Trust variant) */}
+            <div className="flex flex-col sm:flex-row gap-4 p-4 bg-black/5 rounded-2xl items-center text-left">
+              <img src={industryImages.staff} className="w-16 h-16 rounded-full object-cover border border-amber-900/10 flex-shrink-0" alt="Chef Marcus" />
+              <div className="space-y-1">
+                <h5 className="text-xs font-bold text-slate-800">{staff[0]?.name || "Chef Marcus"} — {staff[0]?.role || "Head Chef"}</h5>
+                <p className="text-[10px] opacity-75 leading-relaxed font-light">"Our culinary team prepares every recipe from scratch using locally sourced, fresh organic ingredients. We guarantee a delicious local taste every single visit."</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 2: Conversion-focused Lead Gen (form + book buttons)
+      if (variant === 2) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start text-left">
+            <div className="md:col-span-7 space-y-4">
+              <h3 className="text-lg font-bold uppercase tracking-tight text-slate-700">Order & Reservation Highlights</h3>
+              <div className="space-y-3">
+                {items.map((item, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg ${theme.cardBg} flex justify-between items-center gap-4`}>
+                    <div>
+                      <h4 className="font-bold text-xs">{item.name}</h4>
+                      <p className="text-[10px] opacity-70 mt-0.5 line-clamp-1">{item.desc}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className={`block text-xs font-bold ${theme.accentText} mb-1`}>{item.price}</span>
+                      <button 
+                        onClick={() => {
+                          setSelectedService(`Pre-order: ${item.name}`);
+                          document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className={`px-2 py-1 min-h-[30px] rounded text-[9px] font-bold text-white ${theme.accentBg}`}
+                      >
+                        Order Table Slot
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-5 bg-black/5 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-4">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Book A Table Slot</h4>
+              {bookingSubmitted ? (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded text-center text-xs font-bold animate-pulse">
+                  Reservation slot confirmed! We will text you.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-[11px] text-inherit focus:outline-none focus:border-indigo-500" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input type="date" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-[11px] text-inherit focus:outline-none" />
+                    <select className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2 text-[11px] text-inherit focus:outline-none">
+                      <option>2 Guests</option>
+                      <option>4 Guests</option>
+                      <option>6+ Guests</option>
+                    </select>
+                  </div>
+                  <button 
+                    onClick={() => setBookingSubmitted(true)}
+                    className={`w-full py-2 min-h-[38px] rounded text-xs font-bold text-white ${theme.accentBg}`}
+                  >
+                    Confirm Table Slot
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 3: Storytelling & Brand (Asymmetric, Chef quote, food story description)
+      if (variant === 3) {
+        return (
+          <div className="space-y-12 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-black/5 p-6 rounded-3xl">
+              <div className="md:col-span-5 rounded-2xl overflow-hidden shadow-lg w-full max-w-xs mx-auto">
+                <img src={industryImages.staff} className="w-full h-48 object-cover" alt="Chef Marcus" />
+              </div>
+              <div className="md:col-span-7 space-y-4">
+                <span className="text-[9px] tracking-widest font-semibold uppercase text-slate-500 block">Chef's Culinary Philosophy</span>
+                <h3 className="text-xl font-bold">"Flavors Inspired by Heritage"</h3>
+                <p className="text-xs font-sans opacity-80 leading-relaxed font-light">
+                  Led by <span className="font-bold">{staff[0]?.name || "Chef Marcus"}</span>, our kitchen honors local culinary roots. We roast our coffee using single-origin beans and bake pastries fresh every morning to bring true passion to your table.
+                </p>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="text-center space-y-2">
+                <h3 className="text-lg uppercase tracking-wider font-light">Featured Culinary Creations</h3>
+                <p className="text-[10px] opacity-60">A detailed glimpse into the inspiration behind our favorites.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+                {items.map((item, idx) => (
+                  <div key={idx} className="space-y-2">
+                    <h4 className="font-bold text-xs uppercase tracking-wide border-b border-current pb-1 border-opacity-10">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 leading-relaxed font-light">{item.desc}</p>
+                    <span className="block text-xs font-serif italic mt-1">{item.price}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 4: Premium/Luxury (classic serif menu, thin lines, dotted leaders, clean)
+      if (variant === 4) {
+        return (
+          <div className="space-y-8 font-serif max-w-2xl mx-auto text-left">
+            <div className="text-center space-y-2">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Bespoke Dining Selection</span>
+              <h3 className="text-xl font-light">La Carte Du Jour</h3>
+            </div>
+            <div className="space-y-6 font-serif">
+              {items.map((item, idx) => (
+                <div key={idx} className="space-y-1">
+                  <div className="flex justify-between items-baseline gap-4">
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-800 dark:text-slate-200">{item.name}</h4>
+                    <div className="flex-1 border-b border-dotted border-slate-300 dark:border-slate-800 mx-2" />
+                    <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-400 font-sans font-light">{item.price}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 font-sans font-light leading-normal pr-12">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center pt-4 font-sans">
+              <a href={`tel:${phone}`} className="text-[9px] uppercase tracking-[0.2em] font-bold text-slate-500 border-b border-current pb-1 hover:opacity-85">Private Dining Reservations</a>
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 5: Modern High-Impact (Dark styled, active special pills, bold price tags)
+      if (variant === 5) {
+        return (
+          <div className="space-y-8 text-left">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] text-indigo-400 font-bold">Fresh Daily Crafts</span>
+              <h3 className="text-2xl font-black mt-1">The Signature Eats</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="inline-block bg-indigo-500/10 text-indigo-400 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Signature</span>
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-200">{item.price}</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Chef Section */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-sm mx-auto w-full">
-              <img src={industryImages.staff} className="w-full h-56 object-cover" alt="Chef profile" />
-            </div>
-            <div className="md:col-span-8 space-y-4 text-left">
-              <h4 className={`text-xl font-bold text-center md:text-left ${theme.fontDisplay}`}>Behind the Flavors</h4>
-              <p className="text-sm opacity-80 leading-relaxed font-light">
-                Our culinary vision is led by <span className="font-semibold">{staff[0]?.name || "Our Culinary Director"}</span>, who serves as our dedicated <span className="font-semibold">{staff[0]?.role || "Chef"}</span>. Every recipe is crafted using premium, locally-sourced ingredients to provide you with an unforgettable experience.
-              </p>
-            </div>
-          </div>
-
-          {/* Table Reservations Form */}
-          <div className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} space-y-4 max-w-xl mx-auto`}>
-            <div className="text-center space-y-1">
-              <h4 className="font-bold text-sm uppercase tracking-wider">Book A Table Reservation</h4>
-              <p className="text-[11px] opacity-70">Instantly schedule your dining experience with us.</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input type="text" placeholder="Name" className="w-full bg-black/5 border border-slate-350 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-              <input type="date" className="w-full bg-black/5 border border-slate-350 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-              <select className="w-full bg-black/5 border border-slate-350 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500 cursor-pointer">
-                <option>2 Guests</option>
-                <option>4 Guests</option>
-                <option>6+ Guests</option>
-              </select>
-            </div>
-            <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
-              Reserve Table Now
-            </button>
-          </div>
-        </div>
-      );
+        );
+      }
     }
 
-    // 2. Salon
+    // ----------------------------------------------------
+    // 2. SALON CATEGORY
+    // ----------------------------------------------------
     if (category === 'salon') {
       const items = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "Haircut & Luxury Blowout", price: "$65", features: ["Consultation & Guide", "Scalp Conditioning", "Professional Styling"] },
@@ -395,26 +545,153 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Elena Rostova", role: "Master Hair Stylist" }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Services Catalog */}
+      // Variant 1: Trust
+      if (variant === 1) {
+        return (
           <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Premium Beauty Services</h3>
-              <p className="text-xs opacity-70 mt-1">Explore our highly curated beauty, cuts, and coloring services.</p>
+            <div className="text-left border-l-4 border-rose-655 pl-3">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-rose-655">Satisfaction Guaranteed Services</span>
+              <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Premium Beauty Services</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {items.map((item, idx) => (
-                <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-baseline gap-4">
-                      <h4 className="font-bold text-sm leading-tight">{item.name}</h4>
-                      <span className={`text-sm font-bold ${theme.accentText} whitespace-nowrap`}>{item.price}</span>
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-3`}>
+                  <div className="flex justify-between items-baseline gap-2">
+                    <h4 className="font-bold text-xs sm:text-sm">{item.name}</h4>
+                    <span className={`text-xs font-bold ${theme.accentText}`}>{item.price}</span>
+                  </div>
+                  <ul className="space-y-1 text-[10px] font-light opacity-75">
+                    {item.features?.map((feat, i) => (
+                      <li key={i} className="flex items-center gap-1.5">
+                        <Check className="w-3 h-3 text-emerald-500" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="text-[9px] text-slate-550 border-t border-slate-100 pt-2 flex justify-between">
+                    <span>100% Satisfaction Ticks</span>
+                    <span>5.0 ★ Star Reviewed</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 2: Conversion
+      if (variant === 2) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-lg font-bold uppercase text-slate-700">Select Beauty Treatment</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-baseline gap-2">
+                      <h4 className="font-bold text-xs">{item.name}</h4>
+                      <span className={`text-sm font-bold ${theme.accentText}`}>{item.price}</span>
                     </div>
-                    <ul className="space-y-2 text-[11px] font-light opacity-75 text-left">
+                    <ul className="space-y-1 text-[10px] font-light opacity-75">
                       {item.features?.map((feat, i) => (
-                        <li key={i} className="flex items-center gap-2">
-                          <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                        <li key={i} className="flex items-center gap-1">
+                          <Check className="w-3 h-3 text-indigo-500" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setSelectedService(item.name);
+                      document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className={`w-full py-1.5 min-h-[36px] rounded text-[10px] font-bold text-white mt-4 ${theme.accentBg}`}
+                  >
+                    Book Treatment Slot
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 3: Storytelling
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left">
+            <div className="flex flex-col sm:flex-row gap-6 p-6 bg-black/5 rounded-2xl items-center">
+              <img src={industryImages.staff} className="w-24 h-24 rounded-full object-cover border border-rose-900/10 flex-shrink-0" alt="Elena" />
+              <div className="space-y-3">
+                <span className="text-[9px] tracking-widest font-semibold uppercase text-slate-500 block">Master Hair Stylist</span>
+                <h3 className="text-xl font-bold">Meet Elena Rostova</h3>
+                <p className="text-xs font-sans opacity-85 leading-relaxed font-light">
+                  Our luxury treatments are guided by our lead stylist, <span className="font-semibold">{staff[0]?.name || "Elena Rostova"}</span>. Elena specializes in modern hair design and coloring, creating holistic styling rituals tailored for your unique persona.
+                </p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg uppercase tracking-wider font-light text-center">Styling Rituals</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+                {items.map((item, idx) => (
+                  <div key={idx} className="space-y-2">
+                    <h4 className="font-bold text-xs uppercase tracking-wide border-b border-current pb-1 border-opacity-10">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">A custom session designed around scalp diagnostics, conditioning, and finished with styled blowdry.</p>
+                    <span className="block text-xs font-serif italic">{item.price}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 4: Premium/Luxury
+      if (variant === 4) {
+        return (
+          <div className="space-y-8 font-serif max-w-2xl mx-auto text-left">
+            <div className="text-center space-y-2">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Curated Treatments & Tariffs</span>
+              <h3 className="text-xl font-light">Aesthetic Services</h3>
+            </div>
+            <div className="space-y-6">
+              {items.map((item, idx) => (
+                <div key={idx} className="space-y-1">
+                  <div className="flex justify-between items-baseline gap-4">
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-800 dark:text-slate-200">{item.name}</h4>
+                    <div className="flex-1 border-b border-dotted border-slate-350 dark:border-slate-850 mx-2" />
+                    <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-400 font-sans font-light">{item.price}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-550 font-sans font-light leading-normal">{item.features.join(" • ")}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 5: Modern High-Impact
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] text-rose-500 font-bold">Hair & Color Catalog</span>
+              <h3 className="text-2xl font-black mt-1">Specialty Styling</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="inline-block bg-rose-500/10 text-rose-500 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Salon Session</span>
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-200">{item.price}</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100">{item.name}</h4>
+                    <ul className="space-y-1 text-[9px] opacity-75 mt-2">
+                      {item.features?.map((feat, i) => (
+                        <li key={i} className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -424,24 +701,13 @@ export default function TemplateRenderer({ data, variant = 1 }) {
               ))}
             </div>
           </div>
-
-          {/* Expert Stylist Profile */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-sm mx-auto w-full">
-              <img src={industryImages.staff} className="w-full h-56 object-cover" alt="Stylist profile" />
-            </div>
-            <div className="md:col-span-8 space-y-4 text-left">
-              <h4 className={`text-xl font-bold text-center md:text-left ${theme.fontDisplay}`}>Meet Our Master Stylist</h4>
-              <p className="text-sm opacity-80 leading-relaxed font-light">
-                Our luxury treatments are guided by our lead stylist, <span className="font-semibold">{staff[0]?.name || "Elena Rostova"}</span>, who specializes in modern hair design as a certified <span className="font-semibold">{staff[0]?.role || "Lead Specialist"}</span>.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
+        );
+      }
     }
 
-    // 3. Mobile Repair Shop
+    // ----------------------------------------------------
+    // 3. REPAIR SHOP CATEGORY
+    // ----------------------------------------------------
     if (category === 'repair_shop') {
       const pricing = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "Glass/Screen Replacement", price: "Starts at $79", features: ["OEM Quality Glass", "1-Hour Turnaround", "90-Day Warranty"] },
@@ -450,50 +716,166 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       ];
       const brands = industryDetails?.brands?.length > 0 ? industryDetails.brands : ["Apple iPhone", "Samsung Galaxy", "Google Pixel", "OnePlus"];
 
-      return (
-        <div className="space-y-12">
-          {/* Supported brands */}
-          <div className="p-4 sm:p-6 bg-black/5 rounded-3xl text-center space-y-4">
-            <h4 className="text-xs uppercase tracking-[0.25em] text-slate-400 font-bold">Brands We Professionally Service</h4>
-            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-slate-350 text-xs font-mono font-bold">
-              {brands.map((brand, i) => (
-                <span key={i} className="px-3 py-1 bg-slate-800/40 rounded-xl border border-slate-800 shadow-sm whitespace-nowrap">{brand.toUpperCase()}</span>
+      // Variant 1: Trust
+      if (variant === 1) {
+        return (
+          <div className="space-y-8">
+            <div className="p-4 bg-slate-800/20 border border-slate-800 rounded-2xl text-center space-y-3">
+              <span className="text-[9px] tracking-[0.2em] text-sky-400 font-bold uppercase block">Professionally Serviced Brands</span>
+              <div className="flex flex-wrap justify-center gap-2 text-xs font-bold text-slate-300">
+                {brands.map((b, i) => <span key={i} className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg">{b}</span>)}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold uppercase text-left border-l-4 border-sky-400 pl-3">Diagnostics & Estimate Matrix</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {pricing.map((tier, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-3`}>
+                    <div className="flex justify-between items-baseline gap-2">
+                      <h4 className="font-bold text-xs sm:text-sm">{tier.name}</h4>
+                      <span className={`text-xs font-bold ${theme.accentText}`}>{tier.price}</span>
+                    </div>
+                    <p className="text-[10px] opacity-75">All replacements use certified components with strict safety tests.</p>
+                    <div className="text-[9px] text-sky-400 font-semibold border-t border-slate-800 pt-2 flex justify-between">
+                      <span>90-Day Guarantee</span>
+                      <span>OEM Glass Specs</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 2: Conversion
+      if (variant === 2) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left items-start">
+            <div className="md:col-span-7 space-y-4">
+              <h3 className="text-lg font-bold uppercase text-slate-350">Quick Repair Estimates</h3>
+              <div className="space-y-3">
+                {pricing.map((tier, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex justify-between items-center gap-4`}>
+                    <div>
+                      <h4 className="font-bold text-xs">{tier.name}</h4>
+                      <p className="text-[10px] text-slate-400 mt-0.5">{tier.features.join(" • ")}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className="block text-xs font-bold text-sky-400 mb-1">{tier.price}</span>
+                      <button 
+                        onClick={() => {
+                          setSelectedService(tier.name);
+                          document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className={`px-2 py-1 min-h-[30px] rounded text-[9px] font-bold text-white bg-sky-600 hover:bg-sky-500`}
+                      >
+                        Book Repair Slot
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-4">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-400">Request Repair Booking</h4>
+              {bookingSubmitted ? (
+                <div className="p-3 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded text-center text-xs font-bold">
+                  Diagnostic appointment booked! We will text you a confirmation.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <input type="text" placeholder="Your Device Model" className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] text-inherit focus:outline-none" />
+                  <textarea placeholder="Describe the issue..." rows={2} className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-[11px] text-inherit resize-none focus:outline-none" />
+                  <button 
+                    onClick={() => setBookingSubmitted(true)}
+                    className="w-full py-2 min-h-[38px] rounded text-xs font-bold text-white bg-sky-600 hover:bg-sky-500"
+                  >
+                    Confirm Repair Slot
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 3: Storytelling
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left font-mono text-xs">
+            <h3 className="text-lg font-bold tracking-wider text-center uppercase font-sans text-slate-300">How We Restore Devices</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+              <div className="space-y-2 p-4 bg-slate-900 border border-slate-800 rounded-xl">
+                <span className="text-sky-400 font-bold uppercase text-[10px]">01 / Diagnostic Check</span>
+                <p className="text-[11px] opacity-75 font-light leading-relaxed">We perform ultrasonic mapping and physical board diagnostics to pin-point screen/circuit decay before replacing components.</p>
+              </div>
+              <div className="space-y-2 p-4 bg-slate-900 border border-slate-800 rounded-xl">
+                <span className="text-sky-400 font-bold uppercase text-[10px]">02 / Clean-Room Fix</span>
+                <p className="text-[11px] opacity-75 font-light leading-relaxed">Repairs occur in dust-filtered clean benches. Screens are pressurized and batteries balanced to original factory specs.</p>
+              </div>
+              <div className="space-y-2 p-4 bg-slate-900 border border-slate-800 rounded-xl">
+                <span className="text-sky-400 font-bold uppercase text-[10px]">03 / Seal & Warranty</span>
+                <p className="text-[11px] opacity-75 font-light leading-relaxed">Devices are resealed with custom water-resistant adhesives and undergo a 12-point quality check before release.</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Variant 4: Premium/Luxury
+      if (variant === 4) {
+        return (
+          <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Fine Technical Restoration</span>
+              <h3 className="text-lg font-light">Service Guide</h3>
+            </div>
+            <div className="space-y-4">
+              {pricing.map((tier, idx) => (
+                <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-slate-800 pb-2">
+                  <div>
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-300">{tier.name}</h4>
+                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{tier.features.join(" • ")}</p>
+                  </div>
+                  <span className="text-xs text-sky-400 font-sans">{tier.price}</span>
+                </div>
               ))}
             </div>
           </div>
+        );
+      }
 
-          {/* Repair Matrix */}
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Repair Estimates & Pricing</h3>
-              <p className="text-xs opacity-70 mt-1">Transparent pricing for standard device diagnostics and replacement repairs.</p>
+      // Variant 5: Modern High-Impact
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] text-sky-400 font-bold">Standard Hardware Fixes</span>
+              <h3 className="text-xl font-bold mt-1 font-sans text-white">Repair Catalog</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
               {pricing.map((tier, idx) => (
-                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-baseline gap-4">
-                      <h4 className="font-bold text-sm leading-tight">{tier.name}</h4>
-                      <span className={`text-xs font-bold ${theme.accentText} whitespace-nowrap`}>{tier.price}</span>
+                    <div className="flex justify-between items-center">
+                      <span className="bg-sky-500/10 text-sky-400 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">1-Hr Speed</span>
+                      <span className="text-xs font-black text-slate-200">{tier.price}</span>
                     </div>
-                    <ul className="space-y-1.5 text-[11px] font-light opacity-75 text-left">
-                      {tier.features?.map((feat, i) => (
-                        <li key={i} className="flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <h4 className="font-bold text-xs text-slate-100">{tier.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">Quality parts serviced with premium ESD safety procedures.</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      );
+        );
+      }
     }
 
-    // 4. Electronics Store
+    // ----------------------------------------------------
+    // 4. ELECTRONICS STORE CATEGORY
+    // ----------------------------------------------------
     if (category === 'electronics_store') {
       const products = industryDetails?.products?.length > 0 ? industryDetails.products : [
         { name: "Pro Sound Wireless Headphones", price: "$189.99", desc: "Active noise-cancellation with premium audio acoustics." },
@@ -501,34 +883,125 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Dual-Device Wireless Charging Mat", price: "$59.99", desc: "Elegant leather chargepad supporting dual fast QI charging." }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Products highlights */}
+      // Variants
+      if (variant === 1) {
+        return (
           <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Featured Gadgets & Tech</h3>
-              <p className="text-xs opacity-70 mt-1">Check out our latest premium tech, accessories, and gadgets in stock.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <h3 className="text-lg font-bold uppercase text-left border-l-4 border-indigo-400 pl-3">Popular Gadgets In Stock</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {products.map((prod, idx) => (
-                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between text-left`}>
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{prod.name}</h4>
-                    <p className="text-[11px] opacity-75 font-light leading-relaxed">{prod.desc}</p>
-                  </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
-                    <span className={`text-sm font-bold ${theme.accentText}`}>{prod.price}</span>
-                    <button type="button" className={`px-3 py-1.5 min-h-[36px] flex items-center justify-center rounded-lg text-[10px] font-bold cursor-pointer ${theme.accentBg}`}>Shop Item</button>
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-3`}>
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-100">{prod.name}</h4>
+                  <p className="text-[10px] opacity-75 leading-relaxed">{prod.desc}</p>
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+                    <span className="text-xs font-bold text-indigo-400">{prod.price}</span>
+                    <span className="text-[9px] text-slate-500 font-semibold">100% Certified / Brand Warranty</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      );
+        );
+      }
+
+      if (variant === 2) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-lg font-bold uppercase text-slate-350">Secure Product Stock Slot</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {products.map((prod, idx) => (
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-xs text-slate-100">{prod.name}</h4>
+                    <p className="text-[10px] text-slate-400 leading-normal">{prod.desc}</p>
+                  </div>
+                  <div className="mt-4 pt-2 border-t border-slate-800 flex justify-between items-center">
+                    <span className="text-xs font-bold text-indigo-400">{prod.price}</span>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(`Reserve: ${prod.name}`);
+                        document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="px-2 py-1 min-h-[30px] rounded text-[9px] font-bold text-white bg-indigo-650 hover:bg-indigo-555"
+                    >
+                      Reserve Slot
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left">
+            <div className="text-center space-y-2">
+              <h3 className="text-lg uppercase tracking-wider font-light text-slate-300">Why We Curated These Gadgets</h3>
+              <p className="text-[10px] text-slate-500 max-w-md mx-auto leading-relaxed">We select products designed to improve modern work-from-home focus and health monitoring metrics.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {products.map((prod, idx) => (
+                <div key={idx} className="space-y-2 p-4 bg-slate-900/40 border border-slate-800 rounded-xl">
+                  <h4 className="font-bold text-xs uppercase text-slate-200">{prod.name}</h4>
+                  <p className="text-[10px] opacity-75 font-light leading-relaxed">{prod.desc}</p>
+                  <span className="block text-xs font-serif italic text-indigo-400">{prod.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Fine Hardware Catalog</span>
+              <h3 className="text-lg font-light text-slate-300">Curated Hardware</h3>
+            </div>
+            <div className="space-y-4">
+              {products.map((prod, idx) => (
+                <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-slate-850 pb-2">
+                  <div>
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-300">{prod.name}</h4>
+                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{prod.desc}</p>
+                  </div>
+                  <span className="text-xs text-indigo-400 font-sans">{prod.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-xl font-bold font-sans text-white">Specials Grid</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
+              {products.map((prod, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="bg-indigo-500/10 text-indigo-400 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">In Stock</span>
+                      <span className="text-xs font-black text-slate-200">{prod.price}</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-100">{prod.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{prod.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
     }
 
-    // 5. Gym / Fitness
+    // ----------------------------------------------------
+    // 5. GYM / FITNESS CATEGORY
+    // ----------------------------------------------------
     if (category === 'gym') {
       const plans = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "General Access Membership", price: "$39/mo", features: ["Full Gym Floor Access", "Locker Room & Showers", "Free Fitness Evaluation"] },
@@ -539,99 +1012,251 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Coach Sarah Lin", role: "Yoga Instructor" }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Memberships */}
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Membership Programs</h3>
-              <p className="text-xs opacity-70 mt-1">Select the membership structure tailored to your fitness objectives.</p>
+      // Variants
+      if (variant === 1) {
+        return (
+          <div className="space-y-8">
+            <div className="text-left border-l-4 border-orange-555 pl-3">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-orange-555">Guaranteed No long-term contracts</span>
+              <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Membership Programs</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
               {plans.map((plan, idx) => (
-                <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} flex flex-col justify-between border-2 ${idx === 1 ? 'border-orange-500/55' : 'border-transparent'}`}>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-baseline gap-4">
-                      <h4 className="font-bold text-sm tracking-tight">{plan.name}</h4>
-                      <span className={`text-lg font-bold ${theme.accentText} whitespace-nowrap`}>{plan.price}</span>
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-4 border ${idx === 1 ? 'border-orange-500/50' : 'border-transparent'}`}>
+                  <div className="flex justify-between items-baseline">
+                    <h4 className="font-bold text-xs sm:text-sm">{plan.name}</h4>
+                    <span className="text-sm font-bold text-orange-555">{plan.price}</span>
+                  </div>
+                  <ul className="space-y-1 text-[11px] font-light opacity-75">
+                    {plan.features?.map((feat, i) => (
+                      <li key={i} className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-orange-500" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="text-[9px] text-zinc-500 border-t border-zinc-800 pt-2 text-center">
+                    <span>100% Satisfaction Trial Guarantee Included</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 2) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-lg font-bold uppercase text-slate-400">Join a Program Slot</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {plans.map((plan, idx) => (
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-baseline gap-2">
+                      <h4 className="font-bold text-xs">{plan.name}</h4>
+                      <span className="text-sm font-bold text-orange-500">{plan.price}</span>
                     </div>
-                    <ul className="space-y-2 text-xs font-light text-zinc-400 text-left">
+                    <ul className="space-y-1 text-[11px] font-light opacity-75">
                       {plan.features?.map((feat, i) => (
-                        <li key={i} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
+                        <li key={i} className="flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-orange-500" />
                           <span>{feat}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-bold uppercase tracking-wider mt-6 cursor-pointer ${theme.accentBg}`}>Join Program</button>
+                  <button 
+                    onClick={() => {
+                      setSelectedService(`Join: ${plan.name}`);
+                      document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="w-full py-2 min-h-[38px] rounded text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 mt-4"
+                  >
+                    Activate Pass
+                  </button>
                 </div>
               ))}
             </div>
           </div>
+        );
+      }
 
-          {/* Trainers profiles */}
-          <div className="space-y-6">
-            <h3 className={`text-xl font-bold text-center uppercase tracking-wider ${theme.fontDisplay}`}>Meet Our Coaches</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left">
+            <h3 className="text-lg font-bold text-center uppercase tracking-wider text-slate-300">Meet Our Trainers</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto font-sans">
               {trainers.map((train, idx) => (
-                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex items-center gap-4 text-left`}>
-                  <img src={industryImages.staff} className="w-12 h-12 rounded-full object-cover border border-zinc-800 flex-shrink-0" alt="Trainer profile" />
+                <div key={idx} className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center gap-4">
+                  <img src={industryImages.staff} className="w-12 h-12 rounded-full object-cover border border-zinc-800 flex-shrink-0" alt="Trainer" />
                   <div>
-                    <h4 className="font-bold text-sm text-zinc-100">{train.name}</h4>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase mt-0.5">{train.role}</p>
+                    <h4 className="font-bold text-xs text-zinc-100">{train.name}</h4>
+                    <p className="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">{train.role}</p>
+                    <p className="text-[10px] opacity-70 mt-1 font-light leading-relaxed">"Dedicated to making fitness simple and habit-based."</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      );
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Elite Personal Training & Access</span>
+              <h3 className="text-lg font-light text-zinc-350">Membership Tariff</h3>
+            </div>
+            <div className="space-y-4">
+              {plans.map((plan, idx) => (
+                <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-zinc-800 pb-2">
+                  <div>
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-zinc-200">{plan.name}</h4>
+                    <p className="text-[10px] text-zinc-500 font-sans font-light leading-normal">{plan.features.join(" • ")}</p>
+                  </div>
+                  <span className="text-xs text-orange-500 font-sans">{plan.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-xl font-bold font-sans text-white">Class Passes</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans">
+              {plans.map((plan, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="bg-orange-500/10 text-orange-500 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Best Value</span>
+                      <span className="text-xs font-black text-slate-200">{plan.price}</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-zinc-100">{plan.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">Full floor access, modern group workouts, and biometric tests.</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
     }
 
-    // 6. Medical Clinic
+    // ----------------------------------------------------
+    // 6. CLINIC CATEGORY
+    // ----------------------------------------------------
     if (category === 'clinic') {
       const doctors = industryDetails?.teamMembers?.length > 0 ? industryDetails.teamMembers : [
         { name: "Dr. Catherine Howard", role: "Chief Pediatric Consultant" }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Doctor profiles */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-teal-900/5 p-4 sm:p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-sm mx-auto w-full">
-              <img src={industryImages.staff} className="w-full h-56 object-cover" alt="Doctor profile" />
-            </div>
-            <div className="md:col-span-8 space-y-4 text-left">
-              <h4 className={`text-xl font-bold text-center md:text-left ${theme.fontDisplay}`}>Professional Healthcare</h4>
-              <p className="text-sm opacity-80 leading-relaxed font-light">
-                Our clinical consultation and diagnostics are led by <span className="font-semibold">{doctors[0]?.name || "Dr. Howard"}</span>, serving as our dedicated <span className="font-semibold">{doctors[0]?.role || "Clinical Director"}</span>. We are fully committed to patient safety, health, and personalized medical attention.
-              </p>
+      if (variant === 1) {
+        return (
+          <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row gap-6 p-6 bg-teal-900/5 border border-teal-100/50 rounded-2xl items-center text-left">
+              <img src={industryImages.staff} className="w-20 h-20 rounded-full object-cover border border-teal-900/10 flex-shrink-0" alt="Doctor" />
+              <div className="space-y-2">
+                <span className="text-[9px] uppercase tracking-wider font-bold text-teal-700">Board Certified Pediatrician</span>
+                <h3 className="text-lg font-bold text-slate-800">{doctors[0]?.name || "Dr. Catherine Howard"}</h3>
+                <p className="text-xs opacity-75 leading-relaxed font-light">"Our clinic provides professional pediatric diagnostics and guidance. We are fully committed to medical board safety regulations, child comfort, and direct doctor communication."</p>
+              </div>
             </div>
           </div>
+        );
+      }
 
-          {/* Consultation timings */}
-          <div className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} text-center space-y-4 max-w-md mx-auto`}>
-            <h4 className="font-bold text-sm uppercase tracking-wider text-teal-800">Weekly Clinical Hours</h4>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between border-b border-teal-100/50 pb-1.5">
-                <span className="font-medium text-slate-500">Monday - Friday</span>
-                <span className="font-bold text-slate-800">{hours || "8:00 AM - 5:00 PM"}</span>
+      if (variant === 2) {
+        return (
+          <div className="space-y-6 text-left max-w-xl mx-auto bg-white p-6 rounded-2xl border border-teal-100 shadow-sm">
+            <h3 className="text-base font-bold uppercase tracking-wider text-teal-800 text-center">Schedule Clinic Consultation Slot</h3>
+            {bookingSubmitted ? (
+              <div className="p-3 bg-teal-500/10 border border-teal-500/20 text-teal-600 rounded text-center text-xs font-bold">
+                Consultation appointment submitted! We will call to confirm.
               </div>
-              <div className="flex justify-between pb-1.5">
-                <span className="font-medium text-slate-500">Saturday - Sunday</span>
-                <span className="font-bold text-slate-800">Emergency Call-In Only</span>
+            ) : (
+              <div className="space-y-3">
+                <input type="text" placeholder="Patient Name" className="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none focus:border-teal-500" />
+                <input type="tel" placeholder="Contact Phone Number" className="w-full bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none focus:border-teal-500" />
+                <button 
+                  onClick={() => setBookingSubmitted(true)}
+                  className="w-full py-2 min-h-[38px] rounded text-xs font-bold text-white bg-teal-600 hover:bg-teal-700"
+                >
+                  Book Patient Slot Now
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      if (variant === 3) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-lg uppercase tracking-wider font-light text-center">Clinical Hours & Timings</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-teal-905/5 p-6 rounded-2xl max-w-xl mx-auto font-sans">
+              <div>
+                <h4 className="font-bold text-xs uppercase text-teal-850">Pediatric Consulting</h4>
+                <p className="text-[11px] opacity-75 mt-1 font-light leading-relaxed">Appointments scheduled Mon-Fri from 9:00 AM to 5:00 PM. Call to verify child history requirements.</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-xs uppercase text-teal-850">Emergency Diagnostics</h4>
+                <p className="text-[11px] opacity-75 mt-1 font-light leading-relaxed">On-call diagnostic consultation available for active family clients during weekend hours.</p>
               </div>
             </div>
-            <a href={`tel:${phone}`} className={`block w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold text-center transition-all ${theme.accentBg}`}>
-              Book Patient Consultation
-            </a>
           </div>
-        </div>
-      );
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Premium Healthcare Consulting</span>
+              <h3 className="text-lg font-light text-teal-950">Specialty Consultations</h3>
+            </div>
+            <div className="space-y-4 font-sans text-xs">
+              <div className="flex justify-between border-b border-slate-100 pb-2">
+                <span>General Pediatric Diagnostics</span>
+                <span className="font-bold text-teal-700">Mon - Fri Consultation</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-100 pb-2">
+                <span>Chronic Child Health Reviews</span>
+                <span className="font-bold text-teal-700">Specialist Scheduling</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-xl font-bold font-sans text-slate-800">Healthcare Departments</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans">
+              <div className="p-4 bg-teal-50 border border-teal-100 rounded-xl space-y-2">
+                <span className="bg-teal-500/10 text-teal-700 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Active Clinic</span>
+                <h4 className="font-bold text-xs text-slate-800">Pediatric Primary Care</h4>
+                <p className="text-[10px] text-slate-550">General growth reviews, diagnostic immunization tests, and child counseling.</p>
+              </div>
+              <div className="p-4 bg-teal-50 border border-teal-100 rounded-xl space-y-2">
+                <span className="bg-teal-500/10 text-teal-700 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Specialist</span>
+                <h4 className="font-bold text-xs text-slate-800">Diagnostic Consultations</h4>
+                <p className="text-[10px] text-teal-550">Complex medical checks, specialized pediatric care plans, and second opinions.</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
     }
 
-    // 7. Coaching Center
+    // ----------------------------------------------------
+    // 7. COACHING CATEGORY
+    // ----------------------------------------------------
     if (category === 'coaching') {
       const courses = services?.length > 0 ? services : [
         { name: "Advanced Physics & Mechanics", desc: "Detailed breakdown of mechanics, electromagnetic theory, and concept applications." },
@@ -639,46 +1264,159 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Computer Programming Foundations", desc: "Hands-on coding introduction in web development languages." }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Courses Offered */}
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Courses & Programs Offered</h3>
-              <p className="text-xs opacity-70 mt-1">Select from our expert academic curricula tailored for student success.</p>
+      // Variants
+      if (variant === 1) {
+        return (
+          <div className="space-y-8 text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center bg-indigo-950/5 p-4 sm:p-6 rounded-3xl max-w-2xl mx-auto">
+              <div className="p-2 border-r border-slate-200">
+                <p className="text-2xl font-black text-indigo-700">98%</p>
+                <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Board Success Rate</p>
+              </div>
+              <div className="p-2 border-r border-slate-200">
+                <p className="text-2xl font-black text-indigo-700">5000+</p>
+                <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Students Mentored</p>
+              </div>
+              <div className="p-2">
+                <p className="text-2xl font-black text-indigo-700">10+</p>
+                <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Certified Teachers</p>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {courses.map((course, idx) => (
-                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between text-left`}>
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-sm leading-tight text-slate-800 dark:text-slate-100">{course.name}</h4>
-                    <p className="text-[11px] opacity-75 font-light leading-relaxed">{course.desc}</p>
+            <div className="space-y-4">
+              <h3 className="font-bold text-lg uppercase pl-3 border-l-4 border-indigo-700">Curricula & Modules</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {courses.map((course, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-2`}>
+                    <h4 className="font-bold text-xs text-slate-800">{course.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{course.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 2) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left items-start">
+            <div className="md:col-span-7 space-y-4">
+              <h3 className="text-lg font-bold uppercase text-indigo-900">Academic Tutoring</h3>
+              <div className="space-y-3">
+                {courses.map((course, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg ${theme.cardBg} flex justify-between items-center gap-4`}>
+                    <div>
+                      <h4 className="font-bold text-xs">{course.name}</h4>
+                      <p className="text-[10px] opacity-70 mt-0.5">{course.desc}</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(`Trial: ${course.name}`);
+                        document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="px-3 py-1.5 min-h-[30px] rounded text-[9px] font-bold text-white bg-indigo-650 hover:bg-indigo-750 flex-shrink-0"
+                    >
+                      Book Trial Class
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-5 bg-black/5 p-4 rounded-xl border border-indigo-100 space-y-4">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Register For A Trial Class</h4>
+              {bookingSubmitted ? (
+                <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 rounded text-center text-xs font-bold">
+                  Class seat booked! We will email you.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <input type="text" placeholder="Student Name" className="w-full bg-white border border-indigo-100 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+                  <select className="w-full bg-white border border-indigo-100 rounded px-2 text-xs text-inherit focus:outline-none">
+                    <option>Physics Trial Class</option>
+                    <option>Mathematics Trial Class</option>
+                    <option>Coding Trial Class</option>
+                  </select>
+                  <button 
+                    onClick={() => setBookingSubmitted(true)}
+                    className="w-full py-2 min-h-[38px] rounded text-xs font-bold text-white bg-indigo-650 hover:bg-indigo-750"
+                  >
+                    Confirm Registration Slot
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left font-sans text-xs">
+            <h3 className="text-lg font-bold tracking-wider text-center uppercase text-indigo-900">Teaching Vision & Methodology</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="space-y-2 p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                <span className="text-indigo-700 font-bold uppercase text-[9px]">Concept Clarity</span>
+                <p className="text-[10px] opacity-75 font-light leading-relaxed">We skip simple rote memorization. Tutors prioritize root formulas and diagnostic steps to make math and physics intuitive.</p>
+              </div>
+              <div className="space-y-2 p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                <span className="text-indigo-700 font-bold uppercase text-[9px]">Bi-Weekly Tests</span>
+                <p className="text-[10px] opacity-75 font-light leading-relaxed">Regular mock tests and performance matrices help track students' exam preparedness and speed-solving habits.</p>
+              </div>
+              <div className="space-y-2 p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+                <span className="text-indigo-700 font-bold uppercase text-[9px]">Personal Reviews</span>
+                <p className="text-[10px] opacity-75 font-light leading-relaxed">Small batch sizes guarantee that each student receives direct feedback, personalized homework checks, and concept drills.</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Premium Academic Curricula</span>
+              <h3 className="text-lg font-light text-indigo-950">Study Modules</h3>
+            </div>
+            <div className="space-y-4">
+              {courses.map((c, idx) => (
+                <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-indigo-100 pb-2">
+                  <div>
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-indigo-900">{c.name}</h4>
+                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{c.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
+        );
+      }
 
-          {/* Success Statistics trust builder */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center bg-indigo-950/5 p-4 sm:p-6 rounded-3xl max-w-2xl mx-auto">
-            <div className="p-2">
-              <p className="text-2xl font-black text-indigo-700">98%</p>
-              <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Success Rate</p>
-            </div>
-            <div className="p-2">
-              <p className="text-2xl font-black text-indigo-700">5000+</p>
-              <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Alumni Guided</p>
-            </div>
-            <div className="p-2">
-              <p className="text-2xl font-black text-indigo-700">10+</p>
-              <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Expert Mentors</p>
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-xl font-bold font-sans text-indigo-955">Curriculum Catalog</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
+              {courses.map((c, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="bg-indigo-500/10 text-indigo-700 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Active Course</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-indigo-900">{c.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{c.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      );
+        );
+      }
     }
 
-    // 8. Retail Store
+    // ----------------------------------------------------
+    // 8. RETAIL STORE CATEGORY
+    // ----------------------------------------------------
     if (category === 'retail_store') {
       const items = industryDetails?.products?.length > 0 ? industryDetails.products : [
         { name: "Modern Linen Summer Set", price: "$89.99", desc: "100% pure organic breathable linen, styled for comfort." },
@@ -686,557 +1424,222 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Premium Wool Designer Overcoat", price: "$199.99", desc: "Tailored classic overcoat crafted from fine virgin wool blends." }
       ];
 
-      return (
-        <div className="space-y-12">
-          {/* Featured items */}
+      // Variants
+      if (variant === 1) {
+        return (
           <div className="space-y-6">
-            <div className="text-center">
-              <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>Our Curated Collections</h3>
-              <p className="text-xs opacity-70 mt-1">Discover our seasonal designer catalog selections in store.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <h3 className="text-lg font-bold uppercase text-left border-l-4 border-[#8b5a2b] pl-3">Our Curated Highlights</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {items.map((item, idx) => (
-                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between text-left`}>
-                  <div className="space-y-3">
-                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{item.name}</h4>
-                    <p className="text-[11px] opacity-75 font-light leading-relaxed">{item.desc}</p>
-                  </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
-                    <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{item.price}</span>
-                    <button type="button" className={`px-3 py-1.5 min-h-[36px] flex items-center justify-center rounded-lg text-[10px] font-bold cursor-pointer ${theme.accentBg}`}>View Details</button>
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-3`}>
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-800">{item.name}</h4>
+                  <p className="text-[10px] opacity-75 leading-relaxed">{item.desc}</p>
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+                    <span className="text-xs font-bold text-[#8b5a2b]">{item.price}</span>
+                    <span className="text-[9px] text-slate-500 font-semibold">100% Cotton / Wool / Leather</span>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 2) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-lg font-bold uppercase text-slate-700">Pre-order From Catalog</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-xs text-slate-850">{item.name}</h4>
+                    <p className="text-[10px] text-slate-500 leading-normal">{item.desc}</p>
+                  </div>
+                  <div className="mt-4 pt-2 border-t border-slate-250 flex justify-between items-center">
+                    <span className="text-xs font-bold text-[#8b5a2b]">{item.price}</span>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(`Retail: ${item.name}`);
+                        document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="px-2 py-1 min-h-[30px] rounded text-[9px] font-bold text-white bg-[#8b5a2b] hover:bg-[#724820]"
+                    >
+                      Reserve Size
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left">
+            <div className="text-center space-y-2">
+              <h3 className="text-lg uppercase tracking-wider font-light text-slate-800">The Design Philosophy</h3>
+              <p className="text-[10px] text-slate-500 max-w-md mx-auto leading-relaxed">We select products designed for seasonal comfort, choosing fabrics like organic cotton, pure linen, and virgin wool blends.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {items.map((item, idx) => (
+                <div key={idx} className="space-y-2 p-4 bg-slate-100 border border-slate-200 rounded-xl">
+                  <h4 className="font-bold text-xs uppercase text-slate-800">{item.name}</h4>
+                  <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                  <span className="block text-xs font-serif italic text-[#8b5a2b]">{item.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Designer Lookbook selections</span>
+              <h3 className="text-lg font-light text-slate-900">Aesthetic Catalog</h3>
+            </div>
+            <div className="space-y-4">
+              {items.map((item, idx) => (
+                <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-slate-200 pb-2">
+                  <div>
+                    <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-900">{item.name}</h4>
+                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{item.desc}</p>
+                  </div>
+                  <span className="text-xs text-[#8b5a2b] font-sans">{item.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <h3 className="text-xl font-bold font-sans text-slate-800">Summer Catalog Selection</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="bg-[#8b5a2b]/10 text-[#8b5a2b] text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">New In</span>
+                      <span className="text-xs font-black text-slate-800">{item.price}</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-800">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // ----------------------------------------------------
+    // 9. GENERAL BUSINESS / FALLBACK
+    // ----------------------------------------------------
+    // We render standard capabilities matching the variant concept
+    if (variant === 1) {
+      return (
+        <div className="space-y-4 text-left">
+          <div className="border-l-4 border-blue-700 pl-3">
+            <span className="text-[9px] uppercase tracking-wider font-bold text-blue-700">Certified local team</span>
+            <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Our Standard Assurances</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className={`p-4 rounded-xl ${theme.cardBg} space-y-2`}>
+              <h4 className="font-bold text-xs text-slate-800">100% Fully Licensed</h4>
+              <p className="text-[10px] opacity-75 leading-relaxed">Our local business holds all required municipal permits and liability coverage for on-site services.</p>
+            </div>
+            <div className={`p-4 rounded-xl ${theme.cardBg} space-y-2`}>
+              <h4 className="font-bold text-xs text-slate-800">Quality Assured</h4>
+              <p className="text-[10px] opacity-75 leading-relaxed">Every client project undergoes diagnostics review to ensure robust performance metrics are met.</p>
+            </div>
+            <div className={`p-4 rounded-xl ${theme.cardBg} space-y-2`}>
+              <h4 className="font-bold text-xs text-slate-800">Locally Supported</h4>
+              <p className="text-[10px] opacity-75 leading-relaxed">Operated directly in the Noida/regional area, providing fast post-completion support for any questions.</p>
             </div>
           </div>
         </div>
       );
     }
 
-    // 9. General Business (Fallback)
-    return null;
-  };
+    if (variant === 2) {
+      return (
+        <div className="p-5 bg-black/5 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl mx-auto text-left space-y-4">
+          <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500 text-center">Request A Callback</h4>
+          {bookingSubmitted ? (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded text-center text-xs font-bold">
+              Callback slot registered! We will dial you within 15 minutes.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+                <input type="tel" placeholder="Phone Number" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+              </div>
+              <button 
+                onClick={() => setBookingSubmitted(true)}
+                className={`w-full py-2 min-h-[38px] rounded text-xs font-bold text-white ${theme.accentBg}`}
+              >
+                Call Me Back
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
 
-  // Testimonials Slider markup
-  const renderTestimonials = () => {
-    const list = testimonials?.length > 0 ? testimonials : [
-      { name: "Sarah M.", text: "Absolutely incredible service. Friendly, fast, and exceeded all my expectations!" },
-      { name: "David K.", text: "Professional staff and unbeatable quality. Highly recommend to everyone in the area." }
-    ];
+    if (variant === 3) {
+      return (
+        <div className="p-6 bg-black/5 rounded-2xl max-w-xl mx-auto text-left space-y-4">
+          <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block text-center">Our Commitment</span>
+          <h4 className="font-bold text-sm text-slate-800 text-center">"Crafting Values, Supporting Noida"</h4>
+          <p className="text-xs opacity-75 leading-relaxed font-light font-sans text-center">We believe business should serve a community. From choosing sustainable suppliers to training apprentice teams, we work every day to deliver positive local impact.</p>
+        </div>
+      );
+    }
 
+    if (variant === 4) {
+      return (
+        <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
+          <div className="text-center space-y-1">
+            <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Fine Corporate Standards</span>
+            <h3 className="text-lg font-light text-slate-800">Our Pillars</h3>
+          </div>
+          <div className="space-y-4 font-sans text-xs">
+            <div className="flex justify-between border-b border-slate-100 pb-2">
+              <span>Bespoke Customer Consultations</span>
+              <span className="font-bold">Tailored To Specifications</span>
+            </div>
+            <div className="flex justify-between border-b border-slate-100 pb-2">
+              <span>Post-Service Technical Validation</span>
+              <span className="font-bold">Certified Standard Reviews</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Variant 5
     return (
-      <div className="space-y-6 py-6 font-sans">
-        <div className="text-center">
-          <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>What Our Clients Say</h3>
-          <div className="w-10 h-0.5 bg-current mx-auto opacity-20 mt-2" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {list.map((t, idx) => (
-            <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} italic relative text-xs font-light leading-relaxed text-left break-words`}>
-              <span className="absolute top-2 left-3 text-3xl opacity-10 font-serif">“</span>
-              <p className="relative z-10 pt-2 opacity-90">"{t.text}"</p>
-              <h5 className="text-[10px] font-bold uppercase tracking-wider text-right mt-4 opacity-75">— {t.name}</h5>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // ----------------------------------------------------
-  // VARIANT 1: Basic & Functional (Stacked clean layout)
-  // ----------------------------------------------------
-  const renderBasic = () => {
-    return (
-      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
-        <div className="space-y-12 py-8 max-w-4xl mx-auto px-4 sm:px-6 text-left relative">
-          {renderConversionFloaters()}
-          
-          {/* Navigation */}
-          <div className="flex justify-between items-center pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
-            <h2 className="text-xl font-bold tracking-tight truncate">{businessName}</h2>
-            <div className="flex-shrink-0">
-              <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded text-xs font-bold transition-all ${theme.accentBg}`}>
-                Call Now
-              </a>
-            </div>
+      <div className="space-y-6 text-left font-sans">
+        <h3 className="text-xl font-bold font-sans text-slate-800">Dynamic Capabilities</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 bg-slate-100 border border-slate-200 rounded-xl space-y-2">
+            <h4 className="font-bold text-xs text-slate-800">Fast Agile Turnarounds</h4>
+            <p className="text-[10px] text-slate-550">We deploy rapid methodologies and modern digital tools to complete client scopes ahead of timeline parameters.</p>
           </div>
-
-          {/* Hero */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
-            <div className="md:col-span-7 space-y-4 order-2 md:order-1">
-              <h1 className={`text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight ${theme.fontDisplay}`}>{heroHeadline}</h1>
-              <p className="text-sm opacity-80 leading-relaxed font-light">{heroSubheadline}</p>
-              <div className="pt-2">
-                <a href={`tel:${phone}`} className={`inline-flex px-5 py-3 min-h-[44px] items-center justify-center rounded text-sm font-semibold cursor-pointer ${theme.accentBg}`}>
-                  {ctaText}
-                </a>
-              </div>
-            </div>
-            <div className="md:col-span-5 rounded-2xl overflow-hidden shadow-lg border border-slate-350 dark:border-slate-800 order-1 md:order-2">
-              <img src={industryImages.hero} className="w-full h-48 object-cover" alt="Business Hero" />
-            </div>
-          </div>
-
-          {renderTrustBadges()}
-
-          {/* Services List */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-bold border-l-4 border-current pl-3">Our Core Offerings</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {services.map((svc, i) => (
-                <div key={i} className="flex gap-3 text-left">
-                  <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${theme.accentText}`} />
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{svc.name}</h4>
-                    <p className="text-xs opacity-75 font-light mt-0.5">{svc.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Industry specific sections */}
-          {renderIndustrySections()}
-
-          {/* Testimonials */}
-          {renderTestimonials()}
-
-          {/* About section */}
-          <div className="p-4 sm:p-6 bg-black/5 rounded-2xl space-y-3 text-left">
-            <h4 className="font-bold text-sm uppercase tracking-wider opacity-60">About Our Company</h4>
-            <p className="text-xs opacity-80 leading-relaxed font-light">{aboutText}</p>
-          </div>
-
-          {/* Essential Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
-            <div>
-              <h4 className="font-bold uppercase tracking-wider opacity-60 mb-1">Our Location</h4>
-              <p className="opacity-90 leading-relaxed">{address}</p>
-            </div>
-            <div>
-              <h4 className="font-bold uppercase tracking-wider opacity-60 mb-1">Business Hours</h4>
-              <p className="opacity-90 leading-relaxed">{hours}</p>
-            </div>
+          <div className="p-4 bg-slate-100 border border-slate-200 rounded-xl space-y-2">
+            <h4 className="font-bold text-xs text-slate-800">Certified Professional Experts</h4>
+            <p className="text-[10px] text-slate-550">Our diagnostic technicians hold key certifications, ensuring premium results across all client requirements.</p>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className={`py-6 text-center text-xs opacity-70 mt-12 px-6 ${theme.footerBg}`}>
-          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
-        </footer>
-      </div>
-    );
-  };
-
-  // ----------------------------------------------------
-  // VARIANT 2: Professional (Corporate Split, Side Form)
-  // ----------------------------------------------------
-  const renderProfessional = () => {
-    return (
-      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
-        <div className="space-y-16 py-12 max-w-5xl mx-auto px-4 sm:px-6 text-left relative">
-          {renderConversionFloaters()}
-
-          {/* Navigation */}
-          <div className="flex justify-between items-center gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <BadgeIcon className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-              <h2 className="text-lg font-bold tracking-tight truncate">{businessName}</h2>
-            </div>
-            <div className="flex items-center gap-4 text-xs font-semibold flex-shrink-0">
-              <span className="opacity-75 hidden sm:inline">{hours}</span>
-              <a href={`tel:${phone}`} className={`px-4 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl transition-all ${theme.accentBg}`}>
-                Call Now
-              </a>
-            </div>
-          </div>
-
-          {/* Split Hero Column */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center pt-4">
-            <div className="md:col-span-7 space-y-6">
-              <span className="text-[10px] font-bold tracking-widest uppercase opacity-50 block">Certified Local Professional</span>
-              <h1 className={`text-3xl sm:text-4xl font-extrabold leading-tight ${theme.fontDisplay}`}>{heroHeadline}</h1>
-              <p className="text-sm opacity-85 leading-relaxed font-light">{heroSubheadline}</p>
-              <div className="flex flex-wrap gap-3">
-                <a href={`tel:${phone}`} className={`px-5 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-semibold text-xs cursor-pointer ${theme.accentBg}`}>
-                  {ctaText}
-                </a>
-                <a href="#pro-services" className={`px-5 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-semibold text-xs cursor-pointer ${theme.buttonSecondary}`}>
-                  Our Services
-                </a>
-              </div>
-            </div>
-
-            {/* Quick Mock Contact Form */}
-            <div className="md:col-span-5 bg-black/5 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500">Request Appointment Slot</h3>
-              <div className="space-y-3">
-                <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-                <input type="email" placeholder="Your Email" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-                <textarea placeholder="Tell us how we can assist you..." rows={3} className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit resize-none focus:outline-none focus:border-indigo-500" />
-                <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
-                  Book Consultation Slot
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {renderTrustBadges()}
-
-          {/* About segment */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-slate-800 shadow-md max-w-sm mx-auto w-full">
-              <img src={industryImages.feature} className="w-full h-48 object-cover" alt="Featured details" />
-            </div>
-            <div className="md:col-span-8 space-y-4 text-left">
-              <h4 className="font-bold text-sm uppercase tracking-wider text-slate-500 text-center md:text-left">Our Corporate Commitment</h4>
-              <p className="text-xs opacity-80 leading-relaxed font-light">{aboutText}</p>
-            </div>
-          </div>
-
-          {/* Services List */}
-          <div id="pro-services" className="space-y-6">
-            <h2 className="text-xl font-bold tracking-tight">Our Specialties & Services</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {services.map((svc, i) => (
-                <div key={i} className={`p-4 sm:p-5 rounded-xl ${theme.cardBg} text-left`}>
-                  <CheckCircle2 className={`w-5 h-5 mb-3 ${theme.accentText}`} />
-                  <h4 className="font-bold text-sm mb-1">{svc.name}</h4>
-                  <p className="text-xs opacity-75 font-light leading-relaxed">{svc.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Industry content */}
-          {renderIndustrySections()}
-
-          {/* Testimonials */}
-          {renderTestimonials()}
-
-          {/* Address and Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-4 sm:p-6 bg-black/5 rounded-2xl text-xs text-left">
-            <div className="flex gap-3">
-              <MapPin className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
-              <div>
-                <h5 className="font-bold uppercase tracking-wider opacity-60">Office Location</h5>
-                <p className="mt-1 leading-relaxed">{address}</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Clock className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
-              <div>
-                <h5 className="font-bold uppercase tracking-wider opacity-60">Working Hours</h5>
-                <p className="mt-1 leading-relaxed">{hours}</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Phone className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
-              <div>
-                <h5 className="font-bold uppercase tracking-wider opacity-60">Phone Support</h5>
-                <a href={`tel:${phone}`} className={`mt-1 block font-bold hover:underline ${theme.accentText}`}>{phone}</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className={`py-8 text-center text-xs opacity-70 mt-12 px-6 ${theme.footerBg}`}>
-          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
-        </footer>
-      </div>
-    );
-  };
-
-  // ----------------------------------------------------
-  // VARIANT 3: Modern (Centered layouts, Glows, Asymmetric)
-  // ----------------------------------------------------
-  const renderModern = () => {
-    return (
-      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between relative`}>
-        {/* Glow circles */}
-        <div className="absolute top-20 left-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-20 right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative py-16 px-4 sm:px-6 max-w-5xl mx-auto text-center space-y-16 flex-1">
-          {renderConversionFloaters()}
-
-          {/* Header */}
-          <div className="flex justify-between items-center relative z-10 gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className={`p-1.5 rounded-lg ${theme.accentText} bg-opacity-10 bg-current flex-shrink-0`}>
-                <BadgeIcon className="w-4 h-4" />
-              </div>
-              <span className="font-bold tracking-wider uppercase text-xs truncate">{businessName}</span>
-            </div>
-            <div className="flex-shrink-0">
-              <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-semibold transition-all ${theme.accentBg}`}>
-                Connect Now
-              </a>
-            </div>
-          </div>
-
-          {/* Hero Area */}
-          <div className="max-w-2xl mx-auto space-y-6 relative z-10">
-            <span className={`text-[9px] tracking-widest font-bold uppercase px-3.5 py-1 rounded-full bg-current bg-opacity-10 ${theme.accentText} inline-block`}>
-              Highly Recommended Local Business
-            </span>
-            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>{heroHeadline}</h1>
-            <p className="text-sm opacity-80 leading-relaxed font-light">{heroSubheadline}</p>
-            <div className="pt-4 flex justify-center">
-              <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${theme.accentBg}`}>
-                Call Us: {phone}
-              </a>
-            </div>
-          </div>
-
-          {/* Large visual card */}
-          <div className="rounded-3xl overflow-hidden border border-current border-opacity-10 shadow-2xl relative z-10 max-w-3xl mx-auto">
-            <img src={industryImages.hero} className="w-full h-64 object-cover" alt="Hero Details" />
-          </div>
-
-          {renderTrustBadges()}
-
-          {/* Services Showcase Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-            {services.map((svc, i) => (
-              <div key={i} className={`p-5 rounded-2xl transition-transform hover:-translate-y-1 duration-300 text-left ${theme.cardBg}`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-4 ${theme.iconColor}`}>
-                  <span className="text-xs font-bold">{i + 1}</span>
-                </div>
-                <h4 className="font-bold text-sm tracking-tight mb-2">{svc.name}</h4>
-                <p className="text-[10px] opacity-75 leading-relaxed font-light">{svc.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Industry sections */}
-          {renderIndustrySections()}
-
-          {/* Testimonials */}
-          {renderTestimonials()}
-
-          {/* About Section */}
-          <div className="max-w-xl mx-auto text-center space-y-3 relative z-10">
-            <h4 className="text-xs uppercase tracking-widest font-bold opacity-60">Who We Are</h4>
-            <p className="text-xs opacity-80 font-light leading-relaxed">{aboutText}</p>
-          </div>
-
-          {/* Contact/Map Banner */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-light text-left p-4 sm:p-6 bg-black/5 rounded-2xl relative z-10 max-w-2xl mx-auto">
-            <div className="space-y-2">
-              <span className="text-[9px] uppercase tracking-wider opacity-60 font-bold">Physical Address Location</span>
-              <p className="font-medium text-sm leading-relaxed">{address}</p>
-            </div>
-            <div className="space-y-2">
-              <span className="text-[9px] uppercase tracking-wider opacity-60 font-bold">Hours & Contact Support</span>
-              <p className="font-medium text-sm leading-relaxed">{hours}</p>
-              <a href={`tel:${phone}`} className={`font-semibold block mt-1 hover:underline ${theme.accentText}`}>Call: {phone}</a>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className={`py-8 text-center text-xs opacity-70 px-6 z-10 relative ${theme.footerBg}`}>
-          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
-        </footer>
-      </div>
-    );
-  };
-
-  // ----------------------------------------------------
-  // VARIANT 4: Premium (Boutique, Serif wide editorial)
-  // ----------------------------------------------------
-  const renderPremium = () => {
-    return (
-      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontDisplay} flex flex-col justify-between`}>
-        <div className="py-20 px-4 sm:px-8 max-w-4xl mx-auto text-center space-y-16 relative flex-1">
-          {renderConversionFloaters()}
-          
-          {/* Luxury Logo */}
-          <div className="space-y-2">
-            <h2 className="text-3xl font-light uppercase tracking-[0.2em] break-words">{businessName}</h2>
-            <div className="w-16 h-0.5 bg-current mx-auto opacity-30" />
-          </div>
-
-          {/* Fine Tagline & Description */}
-          <div className="space-y-6 max-w-2xl mx-auto">
-            <h1 className="text-3xl sm:text-4xl leading-tight font-light">{heroHeadline}</h1>
-            <p className="text-sm font-sans tracking-wide leading-relaxed font-light opacity-75">{heroSubheadline}</p>
-            <div className="pt-4 font-sans">
-              <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] inline-flex items-center justify-center rounded-full text-xs font-bold uppercase tracking-widest cursor-pointer ${theme.accentBg}`}>
-                {ctaText}
-              </a>
-            </div>
-          </div>
-
-          {/* Premium visual banner */}
-          <div className="rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-xl mx-auto">
-            <img src={industryImages.hero} className="w-full h-56 object-cover" alt="Boutique banner" />
-          </div>
-
-          {renderTrustBadges()}
-
-          {/* Luxury Services list */}
-          <div className="space-y-8 pt-6">
-            <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-slate-500">Our Curated Offerings</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-left font-sans">
-              {services.map((svc, i) => (
-                <div key={i} className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-start gap-4">
-                  <div className="space-y-1">
-                    <h4 className="font-bold text-sm tracking-wide text-slate-800 dark:text-slate-200">{svc.name}</h4>
-                    <p className="text-xs opacity-60 font-light">{svc.desc}</p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Industry details */}
-          {renderIndustrySections()}
-
-          {/* Testimonials */}
-          {renderTestimonials()}
-
-          {/* Elegant About block */}
-          <div className="p-6 sm:p-8 border border-current border-opacity-10 rounded-2xl max-w-xl mx-auto text-left font-sans">
-            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Our History & Values</h4>
-            <p className="text-xs opacity-75 font-light leading-relaxed">{aboutText}</p>
-          </div>
-
-          {/* Fine Details block */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs font-sans tracking-wider border-t border-current border-opacity-10 pt-8 text-left max-w-2xl mx-auto">
-            <div className="space-y-2">
-              <h5 className="font-bold uppercase tracking-widest text-slate-500">Our Location</h5>
-              <p className="opacity-80 font-light leading-relaxed">{address}</p>
-            </div>
-            <div className="space-y-2">
-              <h5 className="font-bold uppercase tracking-widest text-slate-500">Appointment Hours</h5>
-              <p className="opacity-80 font-light leading-relaxed">{hours}</p>
-              <p className="opacity-80 font-light mt-2">Direct support: <span className={`font-semibold ${theme.accentText}`}>{phone}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className={`py-10 text-center text-xs opacity-70 px-6 font-sans ${theme.footerBg}`}>
-          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
-        </footer>
-      </div>
-    );
-  };
-
-  // ----------------------------------------------------
-  // VARIANT 5: Flagship (Asymmetric Layout, Large Showcase)
-  // ----------------------------------------------------
-  const renderFlagship = () => {
-    return (
-      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
-        <div className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-20 text-left relative flex-1">
-          {renderConversionFloaters()}
-          
-          {/* Navigation */}
-          <header className="flex justify-between items-center relative z-10 gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.accentBg}`}>
-                <BadgeIcon className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold tracking-tight text-lg truncate">{businessName}</span>
-            </div>
-            <div className="flex-shrink-0">
-              <a href={`tel:${phone}`} className={`px-5 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm tracking-tight transition-transform hover:-translate-y-0.5 ${theme.accentBg}`}>
-                Call
-              </a>
-            </div>
-          </header>
-
-          {/* Hero & Media split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-opacity-10 border border-opacity-20 text-xs font-semibold tracking-wider uppercase ${theme.accentText} bg-current border-current`}>
-                <Award className="w-3.5 h-3.5" />
-                Premium Local Standards
-              </div>
-              <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>
-                {heroHeadline}
-              </h1>
-              <p className="text-sm opacity-85 leading-relaxed font-light">{heroSubheadline}</p>
-              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-                <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${theme.accentBg}`}>
-                  {ctaText}
-                </a>
-                <a href="#flagship-details" className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${theme.buttonSecondary}`}>
-                  Explore Offerings
-                </a>
-              </div>
-            </div>
-
-            {/* Graphics Showcase Block */}
-            <div className="lg:col-span-5 relative max-w-md mx-auto w-full">
-              <div className={`p-4 sm:p-6 rounded-3xl border border-current border-opacity-10 ${theme.cardBg} shadow-xl relative overflow-hidden`}>
-                <img src={industryImages.hero} className="w-full h-44 object-cover rounded-xl border border-current border-opacity-10" alt="Showcase hero" />
-                <h3 className="font-bold text-xs mt-4 uppercase tracking-wider text-slate-500 mb-2">Our Company Bio</h3>
-                <p className="text-xs opacity-75 font-light leading-relaxed">{aboutText}</p>
-              </div>
-            </div>
-          </div>
-
-          {renderTrustBadges()}
-
-          {/* Flagship Services Grid */}
-          <div id="flagship-details" className="space-y-8 relative z-10">
-            <div className="text-center max-w-xl mx-auto space-y-2">
-              <h2 className="text-2xl font-black text-center">Services & Offerings</h2>
-              <p className="text-xs opacity-75">Every service is crafted with high quality specifications to deliver premium results.</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {services.map((svc, i) => (
-                <div key={i} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
-                  <div className="space-y-4">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${theme.iconColor}`}>
-                      <CheckCircle2 className="w-4.5 h-4.5" />
-                    </div>
-                    <h4 className="font-bold text-sm tracking-tight text-slate-800 dark:text-slate-200">{svc.name}</h4>
-                    <p className="text-[11px] opacity-75 font-light leading-relaxed">{svc.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Industry specific sections */}
-          {renderIndustrySections()}
-
-          {/* Testimonials */}
-          {renderTestimonials()}
-
-          {/* Contact/Map Banner details */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 p-4 sm:p-8 bg-black/5 rounded-3xl text-xs relative z-10 text-left">
-            <div className="space-y-2">
-              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Physical Address</span>
-              <p className="font-bold text-sm leading-relaxed">{address}</p>
-              <p className="text-slate-550 mt-1 leading-normal">Walk-in visits are fully welcomed during hours.</p>
-            </div>
-            <div className="space-y-2">
-              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Operational Timings</span>
-              <p className="font-bold text-sm leading-relaxed">{hours}</p>
-              <p className="text-slate-550 mt-1 leading-normal">Support channels are open online 24/7.</p>
-            </div>
-            <div className="space-y-2">
-              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Instant Dial Connection</span>
-              <a href={`tel:${phone}`} className="font-bold text-sm text-indigo-500 block hover:underline">{phone}</a>
-              <p className="text-slate-550 mt-1 leading-normal">Call for query assistance or instant quote bookings.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className={`py-10 text-center text-xs opacity-70 px-6 ${theme.footerBg}`}>
-          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
-        </footer>
       </div>
     );
   };

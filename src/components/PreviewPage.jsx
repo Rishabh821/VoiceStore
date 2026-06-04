@@ -9,37 +9,37 @@ const CONCEPTS = [
   { 
     id: 1, 
     variantId: 1, 
-    name: "Basic & Functional", 
-    desc: "Clean, high-contrast, action-first elements.",
-    layoutDesc: "Action-oriented minimalist presentation with sharp layouts, clear bullets, and quick action headers to drive business leads." 
+    name: "Trust-focused Local", 
+    desc: "Emphasizes reviews, local trust, and direct phone link.",
+    layoutDesc: "A layout focusing on credibility checkmarks, Google/Yelp star badges, and a direct Call conversion action." 
   },
   { 
     id: 2, 
     variantId: 2, 
-    name: "Professional", 
-    desc: "Structured split & integrated request forms.",
-    layoutDesc: "Trustworthy corporate layout with structured split columns, integrated contact estimate cards, and balanced typography."
+    name: "Lead-Generation Form", 
+    desc: "Direct estimate quote form directly in the hero block.",
+    layoutDesc: "A split column layout featuring an appointment/estimate submission form, services matrix, and clear CTAs."
   },
   { 
     id: 3, 
     variantId: 3, 
-    name: "Modern Business", 
-    desc: "Ambient glows & rounded glassmorphic cards.",
-    layoutDesc: "Contemporary design featuring soft circular background glows, modern rounded service panels, and high-impact visual spacing."
+    name: "Storytelling & Brand", 
+    desc: "Immersive hero layout detailing the founder's passion.",
+    layoutDesc: "A narrative brand layout with behind-the-scenes staff quotes, visual gallery items, and storytelling reviews."
   },
   { 
     id: 4, 
     variantId: 4, 
-    name: "Premium", 
-    desc: "Luxury serif details & spacious editorial grids.",
-    layoutDesc: "High-end editorial aesthetic using wide letter-spacing, luxury double margins, thin divider rules, and serif display fonts."
+    name: "Premium Boutique", 
+    desc: "Sophisticated typography, catalog, and minimal layout.",
+    layoutDesc: "Luxury editorial aesthetic with serif fonts, catalog layout pricing lists, and minimal border styling."
   },
   { 
     id: 5, 
     variantId: 5, 
-    name: "Flagship", 
-    desc: "Interactive sections & visual showcase grids.",
-    layoutDesc: "Our flagship layout combining media showcases, interactive portfolio items, dynamic category badges, and modern grid sections."
+    name: "Modern High-Impact", 
+    desc: "Interactive steps, bold headers, and staggered cards.",
+    layoutDesc: "A tech-forward design featuring bold dark sections, step-by-step checklist process blocks, and asymmetric showcase cards."
   }
 ];
 
