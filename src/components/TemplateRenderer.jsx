@@ -74,7 +74,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       cardBg: "bg-white border border-amber-100 shadow-sm hover:shadow-md transition-shadow",
       iconColor: "text-amber-700 bg-amber-50",
       buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-50/50",
-      footerBg: "bg-amber-950 text-amber-100/80 border-t border-amber-900/20",
+      footerBg: "bg-amber-955 text-amber-100/80 border-t border-amber-900/20",
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: Coffee
@@ -139,7 +139,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       cardBg: "bg-white border border-teal-100 hover:border-teal-200 transition-all shadow-sm",
       iconColor: "text-teal-700 bg-teal-50",
       buttonSecondary: "border border-teal-600 text-teal-800 hover:bg-teal-50/50",
-      footerBg: "bg-teal-950 text-teal-100/70 border-t border-teal-900/15",
+      footerBg: "bg-teal-955 text-teal-100/70 border-t border-teal-900/15",
       fontDisplay: "font-sans font-bold",
       fontBody: "font-sans",
       badgeIcon: ShieldCheck
@@ -151,7 +151,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       accentBg: "bg-indigo-650 hover:bg-indigo-750 text-white shadow-md shadow-indigo-500/10",
       cardBg: "bg-white border border-indigo-100 hover:border-indigo-200 transition-all shadow-sm",
       iconColor: "text-indigo-750 bg-indigo-50",
-      buttonSecondary: "border border-indigo-600 text-indigo-850 hover:bg-indigo-50/50",
+      buttonSecondary: "border border-indigo-600 text-indigo-855 hover:bg-indigo-50/50",
       footerBg: "bg-indigo-955 text-indigo-100/70 border-t border-indigo-900/15",
       fontDisplay: "font-sans font-extrabold tracking-tight",
       fontBody: "font-sans",
@@ -188,33 +188,33 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // Custom accent color overrides
   const colorOverrides = {
     indigo: {
-      accentText: "text-indigo-600 dark:text-indigo-400",
+      accentText: "text-indigo-655 dark:text-indigo-400",
       accentBg: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/10",
-      iconColor: "text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/40",
-      buttonSecondary: "border border-indigo-600 text-indigo-850 dark:text-indigo-300 hover:bg-indigo-50/50"
+      iconColor: "text-indigo-655 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/40",
+      buttonSecondary: "border border-indigo-600 text-indigo-855 dark:text-indigo-300 hover:bg-indigo-50/50"
     },
     amber: {
       accentText: "text-amber-850 dark:text-amber-400",
       accentBg: "bg-amber-700 hover:bg-amber-800 text-white shadow-md shadow-amber-500/10",
-      iconColor: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/40",
-      buttonSecondary: "border border-amber-700 text-amber-850 dark:text-amber-300 hover:bg-amber-50/50"
+      iconColor: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-955/40",
+      buttonSecondary: "border border-amber-700 text-amber-855 dark:text-amber-300 hover:bg-amber-50/50"
     },
     emerald: {
       accentText: "text-emerald-700 dark:text-emerald-400",
       accentBg: "bg-emerald-700 hover:bg-emerald-800 text-white shadow-md shadow-emerald-500/10",
-      iconColor: "text-emerald-750 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/40",
+      iconColor: "text-emerald-750 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-955/40",
       buttonSecondary: "border border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50/50"
     },
     rose: {
       accentText: "text-rose-600 dark:text-rose-450",
       accentBg: "bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/10",
-      iconColor: "text-rose-600 bg-rose-50 dark:text-rose-450 dark:bg-rose-950/40",
-      buttonSecondary: "border border-rose-600 text-rose-700 dark:text-rose-350 hover:bg-rose-50/50"
+      iconColor: "text-rose-600 bg-rose-50 dark:text-rose-455 dark:bg-rose-955/40",
+      buttonSecondary: "border border-rose-600 text-rose-750 dark:text-rose-350 hover:bg-rose-50/50"
     },
     sky: {
       accentText: "text-sky-655 dark:text-sky-400",
       accentBg: "bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-500/10",
-      iconColor: "text-sky-655 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/40",
+      iconColor: "text-sky-655 bg-sky-50 dark:text-sky-400 dark:bg-sky-955/40",
       buttonSecondary: "border border-sky-600 text-sky-750 dark:text-sky-300 hover:bg-sky-50/50"
     }
   };
@@ -227,16 +227,45 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   const BadgeIcon = theme.badgeIcon;
 
   // ----------------------------------------------------
+  // AUTOMATIC OVERFLOW DETECTOR & RESOLVER HOOK
+  // ----------------------------------------------------
+  React.useEffect(() => {
+    const auditAndFixOverflow = () => {
+      // Find the element containing our website layout
+      const containers = document.querySelectorAll('.overflow-x-hidden');
+      containers.forEach(container => {
+        const maxWidth = container.clientWidth;
+        if (!maxWidth) return;
+
+        const allChildren = container.querySelectorAll('*');
+        allChildren.forEach(el => {
+          // If child exceeds container client width, restrict it to prevent horizontal scroll
+          if (el.offsetWidth > maxWidth) {
+            console.warn('[Responsiveness Audit] Overflowing element detected & auto-fixed:', el, `Width: ${el.offsetWidth}px, Max: ${maxWidth}px`);
+            el.style.maxWidth = '100%';
+            el.style.boxSizing = 'border-box';
+            el.style.overflowX = 'hidden';
+          }
+        });
+      });
+    };
+
+    // Perform check after render cycle settles
+    const timer = setTimeout(auditAndFixOverflow, 600);
+    return () => clearTimeout(timer);
+  }, [data, variant]);
+
+  // ----------------------------------------------------
   // CONVERSION STICKY FLOATER WIDGETS
   // ----------------------------------------------------
   const renderConversionFloaters = () => (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3 pointer-events-auto">
+    <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3 pointer-events-auto max-w-[calc(100%-2rem)]">
       {/* WhatsApp Button */}
       <a 
         href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`} 
         target="_blank" 
         rel="noreferrer"
-        className="flex items-center gap-2 bg-[#25d366] hover:bg-[#20ba5a] text-white px-4 py-3 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 bg-[#25d366] hover:bg-[#20ba5a] text-white px-4 py-3 min-h-[44px] rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
         title="Chat on WhatsApp"
       >
         <MessageCircle className="w-5 h-5 fill-white text-[#25d366]" />
@@ -246,7 +275,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       {/* Call Button */}
       <a 
         href={`tel:${phone}`} 
-        className="flex items-center gap-2 bg-indigo-650 hover:bg-indigo-555 text-white px-4 py-3 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 bg-indigo-650 hover:bg-indigo-555 text-white px-4 py-3 min-h-[44px] rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
         title="Call Directly"
       >
         <Phone className="w-5 h-5 fill-white text-indigo-600" />
@@ -259,7 +288,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // TRUST BUILDERS GRID (Ratings & Badges)
   // ----------------------------------------------------
   const renderTrustBadges = () => (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center py-6 border-y border-current border-opacity-10 my-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center py-6 border-y border-current border-opacity-10 my-8 break-words">
       <div className="flex flex-col items-center justify-center p-2">
         <div className="flex text-amber-500 mb-1">
           {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-amber-500 text-amber-500" />)}
@@ -272,11 +301,11 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       </div>
       <div className="flex flex-col items-center justify-center p-2">
         <Award className="w-5 h-5 text-indigo-600 mb-1" />
-        <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Locally Owned & Operated</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Locally Owned</p>
       </div>
       <div className="flex flex-col items-center justify-center p-2">
         <CheckCircle2 className="w-5 h-5 text-purple-600 mb-1" />
-        <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">100% Satisfaction Guarantee</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider opacity-60">Satisfaction Guarantee</p>
       </div>
     </div>
   );
@@ -306,11 +335,11 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {items.map((item, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
                   <div className="space-y-2">
                     <div className="flex justify-between items-start gap-4">
                       <h4 className="font-bold text-sm leading-tight">{item.name}</h4>
-                      <span className={`text-xs font-bold ${theme.accentText}`}>{item.price}</span>
+                      <span className={`text-xs font-bold ${theme.accentText} whitespace-nowrap`}>{item.price}</span>
                     </div>
                     <p className="text-[11px] opacity-75 font-light leading-relaxed">{item.desc}</p>
                   </div>
@@ -320,12 +349,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           </div>
 
           {/* Chef Section */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-black/5 p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
+            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-sm mx-auto w-full">
               <img src={industryImages.staff} className="w-full h-56 object-cover" alt="Chef profile" />
             </div>
-            <div className="md:col-span-8 space-y-4">
-              <h4 className={`text-xl font-bold ${theme.fontDisplay}`}>Behind the Flavors</h4>
+            <div className="md:col-span-8 space-y-4 text-left">
+              <h4 className={`text-xl font-bold text-center md:text-left ${theme.fontDisplay}`}>Behind the Flavors</h4>
               <p className="text-sm opacity-80 leading-relaxed font-light">
                 Our culinary vision is led by <span className="font-semibold">{staff[0]?.name || "Our Culinary Director"}</span>, who serves as our dedicated <span className="font-semibold">{staff[0]?.role || "Chef"}</span>. Every recipe is crafted using premium, locally-sourced ingredients to provide you with an unforgettable experience.
               </p>
@@ -333,21 +362,21 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           </div>
 
           {/* Table Reservations Form */}
-          <div className={`p-6 rounded-2xl ${theme.cardBg} space-y-4 max-w-xl mx-auto`}>
+          <div className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} space-y-4 max-w-xl mx-auto`}>
             <div className="text-center space-y-1">
               <h4 className="font-bold text-sm uppercase tracking-wider">Book A Table Reservation</h4>
               <p className="text-[11px] opacity-70">Instantly schedule your dining experience with us.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input type="text" placeholder="Name" className="w-full bg-black/5 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-1.5 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-              <input type="date" className="w-full bg-black/5 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-1.5 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-              <select className="w-full bg-black/5 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-1.5 text-xs text-inherit focus:outline-none focus:border-indigo-500 cursor-pointer">
+              <input type="text" placeholder="Name" className="w-full bg-black/5 border border-slate-350 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
+              <input type="date" className="w-full bg-black/5 border border-slate-350 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
+              <select className="w-full bg-black/5 border border-slate-350 dark:border-slate-800 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500 cursor-pointer">
                 <option>2 Guests</option>
                 <option>4 Guests</option>
                 <option>6+ Guests</option>
               </select>
             </div>
-            <button type="button" className={`w-full py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
+            <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
               Reserve Table Now
             </button>
           </div>
@@ -358,7 +387,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // 2. Salon
     if (category === 'salon') {
       const items = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
-        { name: "Haircut & Luxury Blowout", price: "$65", features: ["Consultation", "Scalp Massage", "Professional Styling"] },
+        { name: "Haircut & Luxury Blowout", price: "$65", features: ["Consultation & Guide", "Scalp Conditioning", "Professional Styling"] },
         { name: "Signature Hair Color & Highlights", price: "$145", features: ["Full Balayage", "Custom Toning Treatment", "Deep Hydration Mask"] },
         { name: "Premium Scalp Therapy", price: "$85", features: ["Organic Scrub", "Steam Infusion", "Blowdry Style"] }
       ];
@@ -376,16 +405,16 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {items.map((item, idx) => (
-                <div key={idx} className={`p-6 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-baseline">
+                    <div className="flex justify-between items-baseline gap-4">
                       <h4 className="font-bold text-sm leading-tight">{item.name}</h4>
-                      <span className={`text-sm font-bold ${theme.accentText}`}>{item.price}</span>
+                      <span className={`text-sm font-bold ${theme.accentText} whitespace-nowrap`}>{item.price}</span>
                     </div>
-                    <ul className="space-y-2 text-[11px] font-light opacity-75">
+                    <ul className="space-y-2 text-[11px] font-light opacity-75 text-left">
                       {item.features?.map((feat, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <Check className="w-3 h-3 text-emerald-500" />
+                          <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -397,12 +426,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           </div>
 
           {/* Expert Stylist Profile */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-black/5 p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
+            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-sm mx-auto w-full">
               <img src={industryImages.staff} className="w-full h-56 object-cover" alt="Stylist profile" />
             </div>
-            <div className="md:col-span-8 space-y-4">
-              <h4 className={`text-xl font-bold ${theme.fontDisplay}`}>Meet Our Master Stylist</h4>
+            <div className="md:col-span-8 space-y-4 text-left">
+              <h4 className={`text-xl font-bold text-center md:text-left ${theme.fontDisplay}`}>Meet Our Master Stylist</h4>
               <p className="text-sm opacity-80 leading-relaxed font-light">
                 Our luxury treatments are guided by our lead stylist, <span className="font-semibold">{staff[0]?.name || "Elena Rostova"}</span>, who specializes in modern hair design as a certified <span className="font-semibold">{staff[0]?.role || "Lead Specialist"}</span>.
               </p>
@@ -416,7 +445,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     if (category === 'repair_shop') {
       const pricing = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "Glass/Screen Replacement", price: "Starts at $79", features: ["OEM Quality Glass", "1-Hour Turnaround", "90-Day Warranty"] },
-        { name: "Premium Battery Service", price: "Starts at $49", features: ["New High-Capacity Cell", "Full Diagnostic Check", "Safe Recycle of Old Battery"] },
+        { name: "Premium Battery Service", price: "Starts at $49", features: ["New High-Capacity Cell", "Full Diagnostic Check", "Safe Battery Recycle"] },
         { name: "Water Damage Restoration", price: "Starts at $99", features: ["Ultrasonic Board Clean", "Micro-soldering Repair", "Dry & Sealed Finish"] }
       ];
       const brands = industryDetails?.brands?.length > 0 ? industryDetails.brands : ["Apple iPhone", "Samsung Galaxy", "Google Pixel", "OnePlus"];
@@ -424,11 +453,11 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       return (
         <div className="space-y-12">
           {/* Supported brands */}
-          <div className="p-6 bg-black/5 rounded-3xl text-center space-y-4">
+          <div className="p-4 sm:p-6 bg-black/5 rounded-3xl text-center space-y-4">
             <h4 className="text-xs uppercase tracking-[0.25em] text-slate-400 font-bold">Brands We Professionally Service</h4>
-            <div className="flex flex-wrap justify-center items-center gap-6 text-slate-350 text-xs font-mono font-bold">
+            <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-slate-350 text-xs font-mono font-bold">
               {brands.map((brand, i) => (
-                <span key={i} className="px-4 py-1.5 bg-slate-800/40 rounded-xl border border-slate-800 shadow-sm">{brand.toUpperCase()}</span>
+                <span key={i} className="px-3 py-1 bg-slate-800/40 rounded-xl border border-slate-800 shadow-sm whitespace-nowrap">{brand.toUpperCase()}</span>
               ))}
             </div>
           </div>
@@ -441,13 +470,13 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {pricing.map((tier, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-baseline">
+                    <div className="flex justify-between items-baseline gap-4">
                       <h4 className="font-bold text-sm leading-tight">{tier.name}</h4>
-                      <span className={`text-xs font-bold ${theme.accentText}`}>{tier.price}</span>
+                      <span className={`text-xs font-bold ${theme.accentText} whitespace-nowrap`}>{tier.price}</span>
                     </div>
-                    <ul className="space-y-1.5 text-[11px] font-light opacity-75">
+                    <ul className="space-y-1.5 text-[11px] font-light opacity-75 text-left">
                       {tier.features?.map((feat, i) => (
                         <li key={i} className="flex items-center gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
@@ -482,14 +511,14 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {products.map((prod, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between text-left`}>
                   <div className="space-y-3">
                     <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{prod.name}</h4>
                     <p className="text-[11px] opacity-75 font-light leading-relaxed">{prod.desc}</p>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
                     <span className={`text-sm font-bold ${theme.accentText}`}>{prod.price}</span>
-                    <button type="button" className={`px-3 py-1 rounded-lg text-[10px] font-bold ${theme.accentBg}`}>Shop Item</button>
+                    <button type="button" className={`px-3 py-1.5 min-h-[36px] flex items-center justify-center rounded-lg text-[10px] font-bold cursor-pointer ${theme.accentBg}`}>Shop Item</button>
                   </div>
                 </div>
               ))}
@@ -506,8 +535,8 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         { name: "Elite Coaching Membership", price: "$79/mo", features: ["All Gym Floor Access", "Uncapped Fitness Classes", "1x Monthly Private Training", "Custom Diet Schedule"] }
       ];
       const trainers = industryDetails?.teamMembers?.length > 0 ? industryDetails.teamMembers : [
-        { name: "Coach Coach Vance", role: "Strength & Conditioning Specialist" },
-        { name: "Coach Sarah Lin", role: "Yoga & Balance Instructor" }
+        { name: "Coach Coach Vance", role: "Strength Specialist" },
+        { name: "Coach Sarah Lin", role: "Yoga Instructor" }
       ];
 
       return (
@@ -520,22 +549,22 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {plans.map((plan, idx) => (
-                <div key={idx} className={`p-6 rounded-2xl ${theme.cardBg} flex flex-col justify-between border-2 ${idx === 1 ? 'border-orange-500/55' : 'border-transparent'}`}>
+                <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} flex flex-col justify-between border-2 ${idx === 1 ? 'border-orange-500/55' : 'border-transparent'}`}>
                   <div className="space-y-4">
-                    <div className="flex justify-between items-baseline">
+                    <div className="flex justify-between items-baseline gap-4">
                       <h4 className="font-bold text-sm tracking-tight">{plan.name}</h4>
-                      <span className={`text-lg font-bold ${theme.accentText}`}>{plan.price}</span>
+                      <span className={`text-lg font-bold ${theme.accentText} whitespace-nowrap`}>{plan.price}</span>
                     </div>
-                    <ul className="space-y-2 text-xs font-light text-zinc-400">
+                    <ul className="space-y-2 text-xs font-light text-zinc-400 text-left">
                       {plan.features?.map((feat, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-orange-500" />
+                          <Check className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
                           <span>{feat}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <button type="button" className={`w-full py-2 rounded-xl text-xs font-bold uppercase tracking-wider mt-6 ${theme.accentBg}`}>Join Program</button>
+                  <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-bold uppercase tracking-wider mt-6 cursor-pointer ${theme.accentBg}`}>Join Program</button>
                 </div>
               ))}
             </div>
@@ -546,11 +575,11 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             <h3 className={`text-xl font-bold text-center uppercase tracking-wider ${theme.fontDisplay}`}>Meet Our Coaches</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto">
               {trainers.map((train, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl ${theme.cardBg} flex items-center gap-4`}>
-                  <img src={industryImages.staff} className="w-12 h-12 rounded-full object-cover border border-zinc-800" alt="Trainer profile" />
+                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex items-center gap-4 text-left`}>
+                  <img src={industryImages.staff} className="w-12 h-12 rounded-full object-cover border border-zinc-800 flex-shrink-0" alt="Trainer profile" />
                   <div>
                     <h4 className="font-bold text-sm text-zinc-100">{train.name}</h4>
-                    <p className="text-[10px] text-zinc-550 font-bold uppercase mt-0.5">{train.role}</p>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase mt-0.5">{train.role}</p>
                   </div>
                 </div>
               ))}
@@ -569,12 +598,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       return (
         <div className="space-y-12">
           {/* Doctor profiles */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-teal-900/5 p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-teal-900/5 p-4 sm:p-6 md:p-8 rounded-3xl">
+            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-sm mx-auto w-full">
               <img src={industryImages.staff} className="w-full h-56 object-cover" alt="Doctor profile" />
             </div>
-            <div className="md:col-span-8 space-y-4">
-              <h4 className={`text-xl font-bold ${theme.fontDisplay}`}>Professional Healthcare</h4>
+            <div className="md:col-span-8 space-y-4 text-left">
+              <h4 className={`text-xl font-bold text-center md:text-left ${theme.fontDisplay}`}>Professional Healthcare</h4>
               <p className="text-sm opacity-80 leading-relaxed font-light">
                 Our clinical consultation and diagnostics are led by <span className="font-semibold">{doctors[0]?.name || "Dr. Howard"}</span>, serving as our dedicated <span className="font-semibold">{doctors[0]?.role || "Clinical Director"}</span>. We are fully committed to patient safety, health, and personalized medical attention.
               </p>
@@ -582,19 +611,19 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           </div>
 
           {/* Consultation timings */}
-          <div className={`p-6 rounded-2xl ${theme.cardBg} text-center space-y-4 max-w-md mx-auto`}>
+          <div className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} text-center space-y-4 max-w-md mx-auto`}>
             <h4 className="font-bold text-sm uppercase tracking-wider text-teal-800">Weekly Clinical Hours</h4>
             <div className="space-y-2 text-xs">
               <div className="flex justify-between border-b border-teal-100/50 pb-1.5">
-                <span className="font-medium text-slate-655">Monday - Friday</span>
+                <span className="font-medium text-slate-500">Monday - Friday</span>
                 <span className="font-bold text-slate-800">{hours || "8:00 AM - 5:00 PM"}</span>
               </div>
               <div className="flex justify-between pb-1.5">
-                <span className="font-medium text-slate-655">Saturday - Sunday</span>
+                <span className="font-medium text-slate-500">Saturday - Sunday</span>
                 <span className="font-bold text-slate-800">Emergency Call-In Only</span>
               </div>
             </div>
-            <a href={`tel:${phone}`} className={`block w-full py-2 rounded-lg text-xs font-bold text-center transition-all ${theme.accentBg}`}>
+            <a href={`tel:${phone}`} className={`block w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold text-center transition-all ${theme.accentBg}`}>
               Book Patient Consultation
             </a>
           </div>
@@ -620,7 +649,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {courses.map((course, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between text-left`}>
                   <div className="space-y-2">
                     <h4 className="font-bold text-sm leading-tight text-slate-800 dark:text-slate-100">{course.name}</h4>
                     <p className="text-[11px] opacity-75 font-light leading-relaxed">{course.desc}</p>
@@ -631,16 +660,16 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           </div>
 
           {/* Success Statistics trust builder */}
-          <div className="grid grid-cols-3 gap-4 text-center bg-indigo-950/5 p-6 rounded-3xl">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center bg-indigo-950/5 p-4 sm:p-6 rounded-3xl max-w-2xl mx-auto">
+            <div className="p-2">
               <p className="text-2xl font-black text-indigo-700">98%</p>
               <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Success Rate</p>
             </div>
-            <div>
+            <div className="p-2">
               <p className="text-2xl font-black text-indigo-700">5000+</p>
               <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Alumni Guided</p>
             </div>
-            <div>
+            <div className="p-2">
               <p className="text-2xl font-black text-indigo-700">10+</p>
               <p className="text-[9px] uppercase tracking-wider font-bold opacity-60">Expert Mentors</p>
             </div>
@@ -667,14 +696,14 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {items.map((item, idx) => (
-                <div key={idx} className={`p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between`}>
+                <div key={idx} className={`p-4 sm:p-5 rounded-2xl ${theme.cardBg} flex flex-col justify-between text-left`}>
                   <div className="space-y-3">
                     <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{item.name}</h4>
                     <p className="text-[11px] opacity-75 font-light leading-relaxed">{item.desc}</p>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
                     <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{item.price}</span>
-                    <button type="button" className={`px-3 py-1 rounded-lg text-[10px] font-bold ${theme.accentBg}`}>View Details</button>
+                    <button type="button" className={`px-3 py-1.5 min-h-[36px] flex items-center justify-center rounded-lg text-[10px] font-bold cursor-pointer ${theme.accentBg}`}>View Details</button>
                   </div>
                 </div>
               ))}
@@ -696,14 +725,14 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     ];
 
     return (
-      <div className="space-y-6 py-6">
+      <div className="space-y-6 py-6 font-sans">
         <div className="text-center">
           <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>What Our Clients Say</h3>
           <div className="w-10 h-0.5 bg-current mx-auto opacity-20 mt-2" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {list.map((t, idx) => (
-            <div key={idx} className={`p-6 rounded-2xl ${theme.cardBg} italic relative text-xs font-light leading-relaxed text-left`}>
+            <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} italic relative text-xs font-light leading-relaxed text-left break-words`}>
               <span className="absolute top-2 left-3 text-3xl opacity-10 font-serif">“</span>
               <p className="relative z-10 pt-2 opacity-90">"{t.text}"</p>
               <h5 className="text-[10px] font-bold uppercase tracking-wider text-right mt-4 opacity-75">— {t.name}</h5>
@@ -719,32 +748,32 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // ----------------------------------------------------
   const renderBasic = () => {
     return (
-      <div className={`min-h-full ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
-        <div className="space-y-12 py-8 max-w-4xl mx-auto px-6 text-left relative">
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
+        <div className="space-y-12 py-8 max-w-4xl mx-auto px-4 sm:px-6 text-left relative">
           {renderConversionFloaters()}
           
           {/* Navigation */}
-          <div className="flex justify-between items-center pb-6 border-b border-slate-200 dark:border-slate-800">
-            <h2 className="text-xl font-bold tracking-tight">{businessName}</h2>
-            <div className="flex gap-2">
-              <a href={`tel:${phone}`} className={`px-4 py-2 rounded text-xs font-bold transition-all ${theme.accentBg}`}>
+          <div className="flex justify-between items-center pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
+            <h2 className="text-xl font-bold tracking-tight truncate">{businessName}</h2>
+            <div className="flex-shrink-0">
+              <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded text-xs font-bold transition-all ${theme.accentBg}`}>
                 Call Now
               </a>
             </div>
           </div>
 
           {/* Hero */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-            <div className="md:col-span-7 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+            <div className="md:col-span-7 space-y-4 order-2 md:order-1">
               <h1 className={`text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight ${theme.fontDisplay}`}>{heroHeadline}</h1>
               <p className="text-sm opacity-80 leading-relaxed font-light">{heroSubheadline}</p>
               <div className="pt-2">
-                <a href={`tel:${phone}`} className={`inline-block px-5 py-2.5 rounded text-sm font-semibold ${theme.accentBg}`}>
+                <a href={`tel:${phone}`} className={`inline-flex px-5 py-3 min-h-[44px] items-center justify-center rounded text-sm font-semibold cursor-pointer ${theme.accentBg}`}>
                   {ctaText}
                 </a>
               </div>
             </div>
-            <div className="md:col-span-5 rounded-2xl overflow-hidden shadow-lg border border-slate-350 dark:border-slate-800">
+            <div className="md:col-span-5 rounded-2xl overflow-hidden shadow-lg border border-slate-350 dark:border-slate-800 order-1 md:order-2">
               <img src={industryImages.hero} className="w-full h-48 object-cover" alt="Business Hero" />
             </div>
           </div>
@@ -774,7 +803,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {renderTestimonials()}
 
           {/* About section */}
-          <div className="p-6 bg-black/5 rounded-2xl space-y-3 text-left">
+          <div className="p-4 sm:p-6 bg-black/5 rounded-2xl space-y-3 text-left">
             <h4 className="font-bold text-sm uppercase tracking-wider opacity-60">About Our Company</h4>
             <p className="text-xs opacity-80 leading-relaxed font-light">{aboutText}</p>
           </div>
@@ -783,11 +812,11 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
             <div>
               <h4 className="font-bold uppercase tracking-wider opacity-60 mb-1">Our Location</h4>
-              <p className="opacity-90">{address}</p>
+              <p className="opacity-90 leading-relaxed">{address}</p>
             </div>
             <div>
               <h4 className="font-bold uppercase tracking-wider opacity-60 mb-1">Business Hours</h4>
-              <p className="opacity-90">{hours}</p>
+              <p className="opacity-90 leading-relaxed">{hours}</p>
             </div>
           </div>
         </div>
@@ -805,20 +834,20 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // ----------------------------------------------------
   const renderProfessional = () => {
     return (
-      <div className={`min-h-full ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
-        <div className="space-y-16 py-12 max-w-5xl mx-auto px-6 text-left relative">
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
+        <div className="space-y-16 py-12 max-w-5xl mx-auto px-4 sm:px-6 text-left relative">
           {renderConversionFloaters()}
 
           {/* Navigation */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <BadgeIcon className="w-5 h-5 text-indigo-500" />
-              <h2 className="text-lg font-bold tracking-tight">{businessName}</h2>
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <BadgeIcon className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+              <h2 className="text-lg font-bold tracking-tight truncate">{businessName}</h2>
             </div>
-            <div className="flex items-center gap-4 text-xs font-semibold">
+            <div className="flex items-center gap-4 text-xs font-semibold flex-shrink-0">
               <span className="opacity-75 hidden sm:inline">{hours}</span>
-              <a href={`tel:${phone}`} className={`px-4 py-2 rounded-xl transition-all ${theme.accentBg}`}>
-                Call {phone}
+              <a href={`tel:${phone}`} className={`px-4 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl transition-all ${theme.accentBg}`}>
+                Call Now
               </a>
             </div>
           </div>
@@ -829,24 +858,24 @@ export default function TemplateRenderer({ data, variant = 1 }) {
               <span className="text-[10px] font-bold tracking-widest uppercase opacity-50 block">Certified Local Professional</span>
               <h1 className={`text-3xl sm:text-4xl font-extrabold leading-tight ${theme.fontDisplay}`}>{heroHeadline}</h1>
               <p className="text-sm opacity-85 leading-relaxed font-light">{heroSubheadline}</p>
-              <div className="flex gap-4">
-                <a href={`tel:${phone}`} className={`px-5 py-2.5 rounded-xl font-semibold text-xs ${theme.accentBg}`}>
+              <div className="flex flex-wrap gap-3">
+                <a href={`tel:${phone}`} className={`px-5 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-semibold text-xs cursor-pointer ${theme.accentBg}`}>
                   {ctaText}
                 </a>
-                <a href="#pro-services" className={`px-5 py-2.5 rounded-xl font-semibold text-xs ${theme.buttonSecondary}`}>
+                <a href="#pro-services" className={`px-5 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-semibold text-xs cursor-pointer ${theme.buttonSecondary}`}>
                   Our Services
                 </a>
               </div>
             </div>
 
             {/* Quick Mock Contact Form */}
-            <div className="md:col-span-5 bg-black/5 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="md:col-span-5 bg-black/5 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
               <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500">Request Appointment Slot</h3>
               <div className="space-y-3">
-                <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-1.5 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-                <input type="email" placeholder="Your Email" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-1.5 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
-                <textarea placeholder="Tell us how we can assist you..." rows={3} className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-1.5 text-xs text-inherit resize-none focus:outline-none focus:border-indigo-500" />
-                <button type="button" className={`w-full py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
+                <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
+                <input type="email" placeholder="Your Email" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
+                <textarea placeholder="Tell us how we can assist you..." rows={3} className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit resize-none focus:outline-none focus:border-indigo-500" />
+                <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
                   Book Consultation Slot
                 </button>
               </div>
@@ -856,12 +885,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {renderTrustBadges()}
 
           {/* About segment */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-black/5 p-6 md:p-8 rounded-3xl">
-            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-slate-800 shadow-md">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
+            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-slate-800 shadow-md max-w-sm mx-auto w-full">
               <img src={industryImages.feature} className="w-full h-48 object-cover" alt="Featured details" />
             </div>
             <div className="md:col-span-8 space-y-4 text-left">
-              <h4 className="font-bold text-sm uppercase tracking-wider text-slate-500">Our Corporate Commitment</h4>
+              <h4 className="font-bold text-sm uppercase tracking-wider text-slate-500 text-center md:text-left">Our Corporate Commitment</h4>
               <p className="text-xs opacity-80 leading-relaxed font-light">{aboutText}</p>
             </div>
           </div>
@@ -871,7 +900,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             <h2 className="text-xl font-bold tracking-tight">Our Specialties & Services</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {services.map((svc, i) => (
-                <div key={i} className={`p-5 rounded-xl ${theme.cardBg} text-left`}>
+                <div key={i} className={`p-4 sm:p-5 rounded-xl ${theme.cardBg} text-left`}>
                   <CheckCircle2 className={`w-5 h-5 mb-3 ${theme.accentText}`} />
                   <h4 className="font-bold text-sm mb-1">{svc.name}</h4>
                   <p className="text-xs opacity-75 font-light leading-relaxed">{svc.desc}</p>
@@ -887,19 +916,19 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {renderTestimonials()}
 
           {/* Address and Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-6 bg-black/5 rounded-2xl text-xs text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-4 sm:p-6 bg-black/5 rounded-2xl text-xs text-left">
             <div className="flex gap-3">
               <MapPin className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
               <div>
                 <h5 className="font-bold uppercase tracking-wider opacity-60">Office Location</h5>
-                <p className="mt-1">{address}</p>
+                <p className="mt-1 leading-relaxed">{address}</p>
               </div>
             </div>
             <div className="flex gap-3">
               <Clock className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
               <div>
                 <h5 className="font-bold uppercase tracking-wider opacity-60">Working Hours</h5>
-                <p className="mt-1">{hours}</p>
+                <p className="mt-1 leading-relaxed">{hours}</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -925,43 +954,45 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // ----------------------------------------------------
   const renderModern = () => {
     return (
-      <div className={`min-h-full ${theme.bg} ${theme.fontBody} flex flex-col justify-between relative overflow-hidden`}>
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between relative`}>
         {/* Glow circles */}
         <div className="absolute top-20 left-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-20 right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative py-16 px-6 max-w-5xl mx-auto text-center space-y-16 flex-1">
+        <div className="relative py-16 px-4 sm:px-6 max-w-5xl mx-auto text-center space-y-16 flex-1">
           {renderConversionFloaters()}
 
           {/* Header */}
-          <div className="flex justify-between items-center relative z-10">
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-lg ${theme.accentText} bg-opacity-10 bg-current`}>
+          <div className="flex justify-between items-center relative z-10 gap-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className={`p-1.5 rounded-lg ${theme.accentText} bg-opacity-10 bg-current flex-shrink-0`}>
                 <BadgeIcon className="w-4 h-4" />
               </div>
-              <span className="font-bold tracking-wider uppercase text-xs">{businessName}</span>
+              <span className="font-bold tracking-wider uppercase text-xs truncate">{businessName}</span>
             </div>
-            <a href={`tel:${phone}`} className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${theme.accentBg}`}>
-              Connect Now
-            </a>
+            <div className="flex-shrink-0">
+              <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-semibold transition-all ${theme.accentBg}`}>
+                Connect Now
+              </a>
+            </div>
           </div>
 
           {/* Hero Area */}
           <div className="max-w-2xl mx-auto space-y-6 relative z-10">
-            <span className={`text-[9px] tracking-widest font-bold uppercase px-3.5 py-1 rounded-full bg-current bg-opacity-10 ${theme.accentText}`}>
+            <span className={`text-[9px] tracking-widest font-bold uppercase px-3.5 py-1 rounded-full bg-current bg-opacity-10 ${theme.accentText} inline-block`}>
               Highly Recommended Local Business
             </span>
-            <h1 className={`text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>{heroHeadline}</h1>
+            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>{heroHeadline}</h1>
             <p className="text-sm opacity-80 leading-relaxed font-light">{heroSubheadline}</p>
-            <div className="pt-4 flex justify-center gap-3">
-              <a href={`tel:${phone}`} className={`px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${theme.accentBg}`}>
+            <div className="pt-4 flex justify-center">
+              <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${theme.accentBg}`}>
                 Call Us: {phone}
               </a>
             </div>
           </div>
 
           {/* Large visual card */}
-          <div className="rounded-3xl overflow-hidden border border-current border-opacity-10 shadow-2xl relative z-10">
+          <div className="rounded-3xl overflow-hidden border border-current border-opacity-10 shadow-2xl relative z-10 max-w-3xl mx-auto">
             <img src={industryImages.hero} className="w-full h-64 object-cover" alt="Hero Details" />
           </div>
 
@@ -970,7 +1001,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Services Showcase Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
             {services.map((svc, i) => (
-              <div key={i} className={`p-6 rounded-2xl transition-transform hover:-translate-y-1 duration-300 text-left ${theme.cardBg}`}>
+              <div key={i} className={`p-5 rounded-2xl transition-transform hover:-translate-y-1 duration-300 text-left ${theme.cardBg}`}>
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-4 ${theme.iconColor}`}>
                   <span className="text-xs font-bold">{i + 1}</span>
                 </div>
@@ -993,7 +1024,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           </div>
 
           {/* Contact/Map Banner */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-light text-left p-6 bg-black/5 rounded-2xl relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-light text-left p-4 sm:p-6 bg-black/5 rounded-2xl relative z-10 max-w-2xl mx-auto">
             <div className="space-y-2">
               <span className="text-[9px] uppercase tracking-wider opacity-60 font-bold">Physical Address Location</span>
               <p className="font-medium text-sm leading-relaxed">{address}</p>
@@ -1019,13 +1050,13 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // ----------------------------------------------------
   const renderPremium = () => {
     return (
-      <div className={`min-h-full ${theme.bg} ${theme.fontDisplay} flex flex-col justify-between`}>
-        <div className="py-20 px-8 max-w-4xl mx-auto space-y-16 text-center relative flex-1">
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontDisplay} flex flex-col justify-between`}>
+        <div className="py-20 px-4 sm:px-8 max-w-4xl mx-auto text-center space-y-16 relative flex-1">
           {renderConversionFloaters()}
           
           {/* Luxury Logo */}
           <div className="space-y-2">
-            <h2 className="text-3xl font-light uppercase tracking-[0.2em]">{businessName}</h2>
+            <h2 className="text-3xl font-light uppercase tracking-[0.2em] break-words">{businessName}</h2>
             <div className="w-16 h-0.5 bg-current mx-auto opacity-30" />
           </div>
 
@@ -1034,7 +1065,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             <h1 className="text-3xl sm:text-4xl leading-tight font-light">{heroHeadline}</h1>
             <p className="text-sm font-sans tracking-wide leading-relaxed font-light opacity-75">{heroSubheadline}</p>
             <div className="pt-4 font-sans">
-              <a href={`tel:${phone}`} className={`px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest ${theme.accentBg}`}>
+              <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] inline-flex items-center justify-center rounded-full text-xs font-bold uppercase tracking-widest cursor-pointer ${theme.accentBg}`}>
                 {ctaText}
               </a>
             </div>
@@ -1050,14 +1081,14 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Luxury Services list */}
           <div className="space-y-8 pt-6">
             <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-slate-500">Our Curated Offerings</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-left font-sans">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-left font-sans">
               {services.map((svc, i) => (
                 <div key={i} className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-start gap-4">
                   <div className="space-y-1">
                     <h4 className="font-bold text-sm tracking-wide text-slate-800 dark:text-slate-200">{svc.name}</h4>
                     <p className="text-xs opacity-60 font-light">{svc.desc}</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-500 mt-1" />
+                  <ChevronRight className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
                 </div>
               ))}
             </div>
@@ -1070,13 +1101,13 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {renderTestimonials()}
 
           {/* Elegant About block */}
-          <div className="p-8 border border-current border-opacity-10 rounded-2xl max-w-xl mx-auto text-left font-sans">
+          <div className="p-6 sm:p-8 border border-current border-opacity-10 rounded-2xl max-w-xl mx-auto text-left font-sans">
             <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Our History & Values</h4>
             <p className="text-xs opacity-75 font-light leading-relaxed">{aboutText}</p>
           </div>
 
           {/* Fine Details block */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-xs font-sans tracking-wider border-t border-current border-opacity-10 pt-8 text-left max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs font-sans tracking-wider border-t border-current border-opacity-10 pt-8 text-left max-w-2xl mx-auto">
             <div className="space-y-2">
               <h5 className="font-bold uppercase tracking-widest text-slate-500">Our Location</h5>
               <p className="opacity-80 font-light leading-relaxed">{address}</p>
@@ -1084,7 +1115,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
             <div className="space-y-2">
               <h5 className="font-bold uppercase tracking-widest text-slate-500">Appointment Hours</h5>
               <p className="opacity-80 font-light leading-relaxed">{hours}</p>
-              <p className="opacity-80 font-light mt-1">Direct support: <span className={`font-semibold ${theme.accentText}`}>{phone}</span></p>
+              <p className="opacity-80 font-light mt-2">Direct support: <span className={`font-semibold ${theme.accentText}`}>{phone}</span></p>
             </div>
           </div>
         </div>
@@ -1102,50 +1133,52 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // ----------------------------------------------------
   const renderFlagship = () => {
     return (
-      <div className={`min-h-full ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
-        <div className="py-16 px-6 max-w-6xl mx-auto space-y-20 text-left relative flex-1">
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
+        <div className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-20 text-left relative flex-1">
           {renderConversionFloaters()}
           
           {/* Navigation */}
-          <header className="flex justify-between items-center relative z-10">
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${theme.accentBg}`}>
+          <header className="flex justify-between items-center relative z-10 gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.accentBg}`}>
                 <BadgeIcon className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold tracking-tight text-lg">{businessName}</span>
+              <span className="font-bold tracking-tight text-lg truncate">{businessName}</span>
             </div>
-            <a href={`tel:${phone}`} className={`px-5 py-2.5 rounded-xl font-bold text-sm tracking-tight transition-transform hover:-translate-y-0.5 ${theme.accentBg}`}>
-              Call: {phone}
-            </a>
+            <div className="flex-shrink-0">
+              <a href={`tel:${phone}`} className={`px-5 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm tracking-tight transition-transform hover:-translate-y-0.5 ${theme.accentBg}`}>
+                Call
+              </a>
+            </div>
           </header>
 
           {/* Hero & Media split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-            <div className="lg:col-span-7 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-opacity-10 border border-opacity-20 text-xs font-semibold tracking-wider uppercase ${theme.accentText} bg-current border-current`}>
                 <Award className="w-3.5 h-3.5" />
                 Premium Local Standards
               </div>
-              <h1 className={`text-4xl sm:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>
+              <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>
                 {heroHeadline}
               </h1>
               <p className="text-sm opacity-85 leading-relaxed font-light">{heroSubheadline}</p>
-              <div className="flex flex-wrap gap-4">
-                <a href={`tel:${phone}`} className={`px-6 py-3 rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 ${theme.accentBg}`}>
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${theme.accentBg}`}>
                   {ctaText}
                 </a>
-                <a href="#flagship-details" className={`px-6 py-3 rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 ${theme.buttonSecondary}`}>
+                <a href="#flagship-details" className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${theme.buttonSecondary}`}>
                   Explore Offerings
                 </a>
               </div>
             </div>
 
             {/* Graphics Showcase Block */}
-            <div className="lg:col-span-5 relative">
-              <div className={`p-6 rounded-3xl border border-current border-opacity-10 ${theme.cardBg} shadow-xl relative overflow-hidden`}>
+            <div className="lg:col-span-5 relative max-w-md mx-auto w-full">
+              <div className={`p-4 sm:p-6 rounded-3xl border border-current border-opacity-10 ${theme.cardBg} shadow-xl relative overflow-hidden`}>
                 <img src={industryImages.hero} className="w-full h-44 object-cover rounded-xl border border-current border-opacity-10" alt="Showcase hero" />
                 <h3 className="font-bold text-xs mt-4 uppercase tracking-wider text-slate-500 mb-2">Our Company Bio</h3>
-                <p className="text-xs opacity-75 font-light">{aboutText}</p>
+                <p className="text-xs opacity-75 font-light leading-relaxed">{aboutText}</p>
               </div>
             </div>
           </div>
@@ -1161,7 +1194,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {services.map((svc, i) => (
-                <div key={i} className={`p-6 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
+                <div key={i} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
                   <div className="space-y-4">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${theme.iconColor}`}>
                       <CheckCircle2 className="w-4.5 h-4.5" />
@@ -1181,21 +1214,21 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {renderTestimonials()}
 
           {/* Contact/Map Banner details */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 bg-black/5 rounded-3xl text-xs relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 p-4 sm:p-8 bg-black/5 rounded-3xl text-xs relative z-10 text-left">
             <div className="space-y-2">
               <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Physical Address</span>
-              <p className="font-bold text-sm">{address}</p>
-              <p className="text-slate-500 mt-1">Walk-in visits are fully welcomed during hours.</p>
+              <p className="font-bold text-sm leading-relaxed">{address}</p>
+              <p className="text-slate-550 mt-1 leading-normal">Walk-in visits are fully welcomed during hours.</p>
             </div>
             <div className="space-y-2">
               <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Operational Timings</span>
-              <p className="font-bold text-sm">{hours}</p>
-              <p className="text-slate-500 mt-1">Support channels are open online 24/7.</p>
+              <p className="font-bold text-sm leading-relaxed">{hours}</p>
+              <p className="text-slate-550 mt-1 leading-normal">Support channels are open online 24/7.</p>
             </div>
             <div className="space-y-2">
               <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Instant Dial Connection</span>
               <a href={`tel:${phone}`} className="font-bold text-sm text-indigo-500 block hover:underline">{phone}</a>
-              <p className="text-slate-500 mt-1">Call for query assistance or instant quote bookings.</p>
+              <p className="text-slate-550 mt-1 leading-normal">Call for query assistance or instant quote bookings.</p>
             </div>
           </div>
         </div>
