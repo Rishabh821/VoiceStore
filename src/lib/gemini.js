@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { parseBusinessText } from "../utils/parser";
 
 /**
  * Extracts copy-rich, structured business details from freeform text using Google Gemini AI.
@@ -151,28 +152,29 @@ JSON Structure Requirements:
   }
 
   // JSON parsing safeguards and error messages
+  const validCategories = [
+    "restaurant",
+    "salon",
+    "repair_shop",
+    "electronics_store",
+    "gym",
+    "clinic",
+    "coaching",
+    "retail_store",
+    "general"
+  ];
+
   try {
     let cleanedText = responseText.trim();
-    if (cleanedText.startsWith("```")) {
-      cleanedText = cleanedText
-        .replace(/^```json\s*/i, "")
-        .replace(/```$/, "")
-        .trim();
+    
+    // Find the first '{' and the last '}' to strip any pre/post conversation text or markdown backticks
+    const firstBrace = cleanedText.indexOf('{');
+    const lastBrace = cleanedText.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      cleanedText = cleanedText.substring(firstBrace, lastBrace + 1);
     }
 
     const parsed = JSON.parse(cleanedText);
-
-    const validCategories = [
-      "restaurant",
-      "salon",
-      "repair_shop",
-      "electronics_store",
-      "gym",
-      "clinic",
-      "coaching",
-      "retail_store",
-      "general"
-    ];
 
     return {
       businessName: parsed.businessName || "My Business",
@@ -204,7 +206,51 @@ JSON Structure Requirements:
       }
     };
   } catch (parseError) {
-    console.error("JSON parsing failed for response:", responseText, parseError);
-    throw new Error("Gemini returned invalid JSON.");
+    console.error("JSON parsing failed for response, executing heuristic fallback:", responseText, parseError);
+    
+    // Heuristic regex fallback parsing to guarantee generation never crashes
+    try {
+      const heuristicParsed = parseBusinessText(text);
+      const matchedCat = validCategories.includes(heuristicParsed.category) 
+        ? heuristicParsed.category 
+        : "general";
+
+      return {
+        businessName: heuristicParsed.businessName || "My Business",
+        phone: heuristicParsed.phone || "(555) 123-4567",
+        hours: heuristicParsed.hours || "Mon - Sun: 9:00 AM - 6:00 PM",
+        address: heuristicParsed.address || "123 Main Street, Cityville",
+        businessType: matchedCat,
+        heroHeadline: `Premium ${heuristicParsed.businessName} Services`,
+        heroSubheadline: `Professional quality and reliable support for all your ${matchedCat} needs.`,
+        aboutText: `We are a locally owned service committed to bringing you the highest standard of excellence. Our team pairs expert knowledge with friendly customer support.`,
+        ctaText: "Connect With Us",
+        whyChooseUs: [
+          "Experienced Professionals",
+          "Customer-Centric Care",
+          "100% Satisfaction Guarantee"
+        ],
+        services: Array.isArray(heuristicParsed.services) 
+          ? heuristicParsed.services.map(s => ({ name: s, desc: "Professional high-quality service." }))
+          : [
+              { "name": "Quality Support", "desc": "Customized plans designed to achieve target metrics." },
+              { "name": "Dedicated Craftsmanship", "desc": "Expert builders delivering prompt, reliable care." }
+            ],
+        testimonials: [
+          { "name": "Sarah M.", "text": "Absolutely incredible service. Friendly, fast, and exceeded all my expectations!" },
+          { "name": "David K.", "text": "Professional staff and unbeatable quality. Highly recommend to everyone in the area." }
+        ],
+        industryDetails: {
+          menuItems: [],
+          pricingTiers: [],
+          teamMembers: [],
+          brands: [],
+          products: []
+        }
+      };
+    } catch (fallbackError) {
+      console.error("Heuristic fallback failed completely:", fallbackError);
+      throw new Error("Unable to parse business description. Please write a cleaner description.");
+    }
   }
 }
