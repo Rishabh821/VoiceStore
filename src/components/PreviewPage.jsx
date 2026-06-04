@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { 
   ArrowLeft, Monitor, Tablet, Smartphone, Sparkles, Plus, 
-  Trash2, Copy, Check, ChevronRight, Edit3, X, Eye, 
-  Smartphone as PhoneIcon, MapPin, Clock, LayoutGrid, Sliders 
+  Trash2, Copy, Check, ChevronRight, Edit3, X, Sliders, LayoutGrid 
 } from 'lucide-react';
 import TemplateRenderer from './TemplateRenderer';
 
 const CONCEPTS = [
   { 
     id: 1, 
-    variantId: 3, 
-    name: "Modern Business", 
-    desc: "Ambient glows & rounded glassmorphic cards.",
-    layoutDesc: "Contemporary design featuring soft circular background glows, modern rounded service panels, and high-impact visual spacing." 
+    variantId: 1, 
+    name: "Basic & Functional", 
+    desc: "Clean, high-contrast, action-first elements.",
+    layoutDesc: "Action-oriented minimalist presentation with sharp layouts, clear bullets, and quick action headers to drive business leads." 
   },
   { 
     id: 2, 
@@ -23,23 +22,23 @@ const CONCEPTS = [
   },
   { 
     id: 3, 
+    variantId: 3, 
+    name: "Modern Business", 
+    desc: "Ambient glows & rounded glassmorphic cards.",
+    layoutDesc: "Contemporary design featuring soft circular background glows, modern rounded service panels, and high-impact visual spacing."
+  },
+  { 
+    id: 4, 
     variantId: 4, 
     name: "Premium", 
     desc: "Luxury serif details & spacious editorial grids.",
     layoutDesc: "High-end editorial aesthetic using wide letter-spacing, luxury double margins, thin divider rules, and serif display fonts."
   },
   { 
-    id: 4, 
-    variantId: 1, 
-    name: "Conversion Focused", 
-    desc: "Clean, high-contrast, action-first elements.",
-    layoutDesc: "Action-oriented minimalist presentation with sharp layouts, clear bullets, and quick action headers to drive business leads."
-  },
-  { 
     id: 5, 
     variantId: 5, 
-    name: "Flagship Design", 
-    desc: "Interactive accordions & visual showcase grids.",
+    name: "Flagship", 
+    desc: "Interactive sections & visual showcase grids.",
     layoutDesc: "Our flagship layout combining media showcases, interactive portfolio items, dynamic category badges, and modern grid sections."
   }
 ];
@@ -47,7 +46,7 @@ const CONCEPTS = [
 export default function PreviewPage({ data, onBack, onUpdateData }) {
   const [viewMode, setViewMode] = useState('selection'); // 'selection' or 'preview'
   const [selectedConcept, setSelectedConcept] = useState(CONCEPTS[0]);
-  const [viewport, setViewport] = useState('desktop'); // 'desktop', 'tablet', 'mobile'
+  const [viewport, setViewport] = useState('desktop'); // 'desktop', 'tablet', 'mobile375', 'mobile390', 'mobile430'
   const [copied, setCopied] = useState(false);
   const [newServiceText, setNewServiceText] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -63,7 +62,10 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
   // Service item updates
   const handleServiceChange = (index, value) => {
     const updatedServices = [...data.services];
-    updatedServices[index] = value;
+    updatedServices[index] = {
+      ...updatedServices[index],
+      name: value
+    };
     handleFieldChange('services', updatedServices);
   };
 
@@ -74,7 +76,8 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
       alert("Maximum of 6 services allowed for this preview template.");
       return;
     }
-    handleFieldChange('services', [...data.services, newServiceText.trim()]);
+    const newSvc = { name: newServiceText.trim(), desc: "Custom service details." };
+    handleFieldChange('services', [...data.services, newSvc]);
     setNewServiceText("");
   };
 
@@ -107,11 +110,13 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
     });
   };
 
-  // Viewport sizes
+  // Requirement 7: Specific mobile viewport widths (375px, 390px, 430px)
   const viewportWidths = {
     desktop: 'w-full max-w-full',
     tablet: 'w-[768px] max-w-full border-x-4 border-slate-800 rounded-2xl',
-    mobile: 'w-[375px] max-w-full border-x-4 border-slate-850 rounded-3xl'
+    mobile375: 'w-[375px] max-w-full border-x-4 border-slate-850 rounded-3xl',
+    mobile390: 'w-[390px] max-w-full border-x-4 border-slate-850 rounded-3xl',
+    mobile430: 'w-[430px] max-w-full border-x-4 border-slate-850 rounded-3xl'
   };
 
   const handleSelectConcept = (concept) => {
@@ -155,11 +160,12 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
               <p className="text-[10px] tracking-[0.2em] font-bold text-indigo-400 uppercase">
                 Generation Completed
               </p>
+              {/* Requirement 4: "Choose Your Favorite Website" header */}
               <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-                Choose your favorite website
+                Choose Your Favorite Website
               </h1>
               <p className="text-slate-400 text-xs sm:text-sm max-w-lg mx-auto font-light leading-relaxed">
-                We've compiled 5 bespoke responsive templates for <span className="font-bold text-slate-200">{data.businessName}</span>. Choose a concept to preview, edit details, and export.
+                Our AI generated 5 distinct visual concepts for <span className="font-bold text-slate-200">{data.businessName}</span> using marketing-copy and realistic graphics. Choose one to preview:
               </p>
             </div>
 
@@ -206,7 +212,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
           </main>
 
           {/* Footer */}
-          <footer className="w-full max-w-6xl mx-auto text-center text-[10px] text-slate-650 z-10 pt-8 border-t border-slate-950">
+          <footer className="w-full max-w-6xl mx-auto text-center text-[10px] text-slate-655 z-10 pt-8 border-t border-slate-950">
             Powered by VoiceStore AI Engine • Pure Client-Side Composition
           </footer>
         </div>
@@ -237,39 +243,53 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
               </div>
             </div>
 
-            {/* Viewport controls */}
-            <div className="hidden sm:flex items-center bg-[#101424] p-1 rounded-xl gap-0.5">
+            {/* Viewport controls (Desktop, Tablet, and 3 Mobile presets) */}
+            <div className="hidden md:flex items-center bg-[#101424] p-1 rounded-xl gap-0.5">
               <button
                 onClick={() => setViewport('desktop')}
-                className={`p-2 rounded-lg transition-all cursor-pointer ${viewport === 'desktop' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${viewport === 'desktop' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
                 title="Desktop View"
               >
-                <Monitor className="w-3.5 h-3.5" />
+                Desktop
               </button>
               <button
                 onClick={() => setViewport('tablet')}
-                className={`p-2 rounded-lg transition-all cursor-pointer ${viewport === 'tablet' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${viewport === 'tablet' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
                 title="Tablet View"
               >
-                <Tablet className="w-3.5 h-3.5" />
+                Tablet
               </button>
               <button
-                onClick={() => setViewport('mobile')}
-                className={`p-2 rounded-lg transition-all cursor-pointer ${viewport === 'mobile' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}
-                title="Mobile View"
+                onClick={() => setViewport('mobile375')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${viewport === 'mobile375' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                title="Mobile SE View (375px)"
               >
-                <Smartphone className="w-3.5 h-3.5" />
+                375px
+              </button>
+              <button
+                onClick={() => setViewport('mobile390')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${viewport === 'mobile390' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                title="Mobile 12 Pro View (390px)"
+              >
+                390px
+              </button>
+              <button
+                onClick={() => setViewport('mobile430')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${viewport === 'mobile430' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+                title="Mobile Pro Max View (430px)"
+              >
+                430px
               </button>
             </div>
 
-            {/* Action buttons */}
+            {/* Action buttons (Requirement 6: "Customize Website") */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsDrawerOpen(true)}
                 className="flex items-center gap-1.5 px-4 py-2 border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl text-xs font-semibold transition-all duration-300 cursor-pointer"
               >
-                <Edit3 className="w-3.5 h-3.5" />
-                <span>Edit Website</span>
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Customize Website</span>
               </button>
 
               <button
@@ -291,11 +311,11 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
             </div>
           </nav>
 
-          {/* Full Screen Preview Viewport Frame */}
+          {/* Full Screen Preview Viewport Frame (Hero of the page) */}
           <div className="flex-1 bg-[#05070e] flex items-center justify-center overflow-hidden relative">
             
             {/* Viewport wrapper occupies 85% width of container for visual framing */}
-            <div className="h-[96%] w-[90%] md:w-[85%] flex items-center justify-center transition-all duration-500">
+            <div className="h-[88%] w-[90%] md:w-[85%] flex items-center justify-center transition-all duration-500 pb-4">
               <div 
                 className={`h-full flex flex-col bg-white text-slate-800 transition-all duration-300 shadow-2xl relative ${viewportWidths[viewport]}`}
               >
@@ -320,11 +340,31 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                 </div>
 
                 {/* Home indicator for mobile simulation */}
-                {viewport === 'mobile' && (
+                {viewport.startsWith('mobile') && (
                   <div className="bg-slate-800 h-6 flex items-center justify-center flex-shrink-0 rounded-b-xl border-t border-slate-700/50">
                     <div className="w-24 h-1 bg-slate-650 rounded-full" />
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Floating Concept Switcher Dock at the bottom */}
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-[#0d1124]/90 backdrop-blur-md border border-slate-800/80 p-2 rounded-2xl flex items-center gap-2 shadow-2xl z-30 select-none max-w-[95%] overflow-x-auto">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500 pl-2 hidden sm:inline">Variants:</span>
+              <div className="flex items-center gap-1">
+                {CONCEPTS.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelectedConcept(c)}
+                    className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer whitespace-nowrap ${
+                      selectedConcept.id === c.id 
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' 
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
               </div>
             </div>
             
@@ -349,7 +389,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                   <div className="flex items-center gap-2">
                     <Sliders className="w-4 h-4 text-indigo-400" />
                     <div>
-                      <h3 className="font-bold text-sm text-slate-200">Edit Website Details</h3>
+                      <h3 className="font-bold text-sm text-slate-200">Customizer</h3>
                       <p className="text-[10px] text-slate-500">Live preview sync updates automatically</p>
                     </div>
                   </div>
@@ -388,11 +428,15 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                       onChange={(e) => handleFieldChange('category', e.target.value)}
                       className="w-full bg-[#13192a] border border-slate-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-indigo-500/80 transition-colors cursor-pointer text-slate-300"
                     >
-                      <option value="eatery">☕ Eatery & Cafe (Serif, Warm)</option>
-                      <option value="creative">🎨 Creative & Studio (Bold, Tech Dark)</option>
-                      <option value="wellness">🌿 Wellness & Gym (Calm, Soft Mint)</option>
-                      <option value="professional">💼 Professional Services (Trust, Blue Slate)</option>
-                      <option value="general">🛍️ Retail & General (Clean Grid)</option>
+                      <option value="restaurant">🍕 Restaurant & Cafe (Serif, Warm)</option>
+                      <option value="salon">✂️ Beauty & Hair Salon (Rose Soft)</option>
+                      <option value="repair_shop">🔧 Mobile & Laptop Repair Shop (Carbon Slate)</option>
+                      <option value="electronics_store">💻 Electronics & Gadget Store (Cyber Dark)</option>
+                      <option value="gym">🏋️ Gym & Fitness Center (High-Contrast Bold)</option>
+                      <option value="clinic">🩺 Medical & Dental Clinic (Teal Clean)</option>
+                      <option value="coaching">🎓 Coaching & Tuition Center (Indigo Academic)</option>
+                      <option value="retail_store">🛍️ Retail Boutique & Store (Minimalist Copper)</option>
+                      <option value="general">💼 General Local Business (Corporate Slate)</option>
                     </select>
                   </div>
 
@@ -442,17 +486,45 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                     </div>
                   </div>
 
-                  {/* Description */}
+                  {/* Hero Headline */}
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                      Business Description
+                      Hero Headline
+                    </label>
+                    <input
+                      type="text"
+                      value={data.heroHeadline}
+                      onChange={(e) => handleFieldChange('heroHeadline', e.target.value)}
+                      className="w-full bg-[#13192a] border border-slate-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-indigo-500/80 transition-colors"
+                      placeholder="Hero headline"
+                    />
+                  </div>
+
+                  {/* Hero Subheadline */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                      Hero Subheadline
                     </label>
                     <textarea
-                      value={data.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
-                      rows={4}
+                      value={data.heroSubheadline}
+                      onChange={(e) => handleFieldChange('heroSubheadline', e.target.value)}
+                      rows={3}
                       className="w-full bg-[#13192a] border border-slate-800 rounded-xl p-4 text-xs focus:outline-none focus:border-indigo-500/80 transition-colors leading-relaxed resize-none"
-                      placeholder="Describe your business..."
+                      placeholder="Hero subheadline text..."
+                    />
+                  </div>
+
+                  {/* About Text */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                      About Description
+                    </label>
+                    <textarea
+                      value={data.aboutText}
+                      onChange={(e) => handleFieldChange('aboutText', e.target.value)}
+                      rows={3}
+                      className="w-full bg-[#13192a] border border-slate-800 rounded-xl p-4 text-xs focus:outline-none focus:border-indigo-500/80 transition-colors leading-relaxed resize-none"
+                      placeholder="About section..."
                     />
                   </div>
 
@@ -529,7 +601,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                         >
                           <input
                             type="text"
-                            value={service}
+                            value={service.name}
                             onChange={(e) => handleServiceChange(index, e.target.value)}
                             className="flex-1 bg-transparent border-none text-xs focus:outline-none text-slate-300 focus:text-white"
                           />

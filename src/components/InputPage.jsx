@@ -29,6 +29,20 @@ const SAMPLES = [
     badge: "Professional Services",
     color: "from-blue-500/20 to-sky-500/20 border-sky-500/30 text-sky-400",
     text: "Vanguard Plumbing & Drain is a locally owned service company in Denver. We specialize in residential leak repairs, fast emergency drainage cleanings, and water heater installations. Find us at 303 Industrial Pkwy, Denver, CO 80202 or call (303) 555-9011. Open 24/7 for emergency repairs. Services: Leak Repair, Water Heater Install, Drain Unclogging, and Boiler Diagnostics."
+  },
+  {
+    title: "Shiny Cut (Hinglish)",
+    icon: Palette,
+    badge: "Beauty & Salon",
+    color: "from-rose-500/20 to-pink-500/20 border-pink-500/30 text-pink-450",
+    text: "Humara salon ka naam hai Shiny Cut aur hum hair cutting, coloring aur styling services Noida sector 62 me de rahe hain. Timings basically subah 9 AM se raat 8 PM tak hai. WhatsApp ya phone pe contact karne ke liye call karein +91 98765 43210. Um actually, clients hume bohot pasand karte hain and hum generic pricing ki jagah premium results dete hain. Open daily."
+  },
+  {
+    title: "QuickFix (Hinglish)",
+    icon: ShieldAlert,
+    badge: "Repair Shop",
+    color: "from-sky-500/20 to-indigo-500/20 border-indigo-500/30 text-indigo-400",
+    text: "Mera laptop aur mobile repair shop Noida Sector 15 me hai, shop ka naam hai QuickFix Repairs. Hum Apple, Samsung, Google Pixel devices ki screen aur battery 1 ghante me change karte hain. Timing is morning 10:00 AM se evening 7:30 PM. Phone number dial karo +91 99999 88888. Matlab customers humara rate aur details check kar sakein isliye online page banana hai."
   }
 ];
 
@@ -46,13 +60,13 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
   const recognitionRef = useRef(null);
   const baseTextRef = useRef("");
 
+  // Requirement 5: Specific animated progress steps
   const steps = [
-    "Contacting Gemini AI client...",
-    "Sending business details for extraction...",
-    "Gemini is analyzing phone & address metadata...",
-    "Categorizing brand and selecting layout...",
-    "Compiling tailwind parameters...",
-    "Assembling website preview..."
+    "Analyzing Business",
+    "Understanding Industry",
+    "Writing Content",
+    "Designing Website",
+    "Finalizing Experience"
   ];
 
   // Query microphone permission state
@@ -96,13 +110,9 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
       };
 
       rec.onerror = (event) => {
-        // Requirement 4: Log "Speech Error:", event
         console.error("Speech Error:", event);
-
-        // Requirement 1: Log the full speech recognition error details
         console.error("Speech Recognition full error event details:", event.error, event);
 
-        // Requirement 3: Separate error code displays and descriptions
         const errorDescriptions = {
           'not-allowed': "Microphone permission was denied by user or system.",
           'network': "Network communication failure occurred.",
@@ -112,8 +122,6 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
         };
 
         const details = errorDescriptions[event.error] || "An unrecognized speech error occurred.";
-        
-        // Requirement 2: Show the exact error code in the UI
         setSpeechError(`[Code: ${event.error}] ${details}`);
         setIsListening(false);
       };
@@ -167,15 +175,17 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
     setLoadingStep(0);
     if (onClearError) onClearError();
 
+    // Start simulated steps timer at 800ms interval
     let currentStep = 0;
     const interval = setInterval(() => {
       if (currentStep < steps.length - 1) {
         currentStep++;
         setLoadingStep(currentStep);
       }
-    }, 600);
+    }, 800);
 
-    const minTimePromise = new Promise((resolve) => setTimeout(resolve, 3600));
+    // Minimum visual duration of 4.0 seconds (within the 3-5 seconds requirement)
+    const minTimePromise = new Promise((resolve) => setTimeout(resolve, 4000));
 
     try {
       const [success] = await Promise.all([
@@ -247,7 +257,7 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
 
             <div className="h-6 flex items-center justify-center">
               <p className="text-sm text-slate-400 animate-pulse">
-                {steps[loadingStep]}
+                {steps[loadingStep]}...
               </p>
             </div>
           </div>
@@ -284,7 +294,7 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
                       if (error && onClearError) onClearError();
                       setDescription(e.target.value);
                     }}
-                    placeholder="e.g. BlueSky Plumbers is an emergency plumbing service in Chicago. We repair leaks, service boilers, and unclog sewers. We are open daily from 8 AM to 8 PM. Located at 120 North Lasalle. Phone: 312-555-0144. Our main services include emergency repair, water line install, and general inspection."
+                    placeholder="e.g. Cozy Grind Cafe is a cozy neighborhood bakery and coffee spot in Austin, TX. We serve signature cinnamon rolls, handcrafted filter coffees, and custom cake orders. Located at 200 Congress Ave. Call us at (512) 555-8932. Open daily 7am to 7pm."
                     rows={12}
                     className="w-full bg-transparent border-0 ring-0 focus:ring-0 text-white placeholder-slate-500 p-4 text-base leading-relaxed resize-none focus:outline-none"
                   />

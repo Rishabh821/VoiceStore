@@ -1,8 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 /**
- * Extracts business details from freeform text using Google Gemini AI.
- * Supports multilingual Hindi/Hinglish inputs, speech fillers, and incomplete inputs.
+ * Extracts copy-rich, structured business details from freeform text using Google Gemini AI.
+ * Supports multilingual inputs, speech fillers, and outputs detailed local-business friendly marketing copy.
  * @param {string} text - The natural language description of the business.
  * @returns {Promise<object>} The parsed business details.
  */
@@ -17,8 +17,8 @@ export async function extractBusinessInfo(text) {
   }
 
   const prompt = `
-You are an expert multilingual business analyst and UI designer. Analyze the following text description of a business.
-This text may be a transcript of natural voice inputs, which can include natural speech patterns, incomplete sentences, grammar errors, code-switching, and common filler words (such as "um", "uh", "actually", "basically", "like", "you know", "matlab", "basically speaking").
+You are an expert multilingual business analyst, local SEO copywriter, and UI designer. Analyze the following text description of a business.
+This text may be a transcript of natural voice inputs, which can include natural speech patterns, incomplete sentences, grammar errors, code-switching, and common filler words (such as "um", "uh", "actually", "basically", "like", "you know", "matlab", "basically speaking", "yaani", "accha").
 
 The text can be in English, Hindi, or Hinglish (Hindi written using the Latin/English script, e.g., "humara salon name hai Shiny Cut aur hum hair services de rhe hain, timings hai 9am se 9pm, phone no dial karo...").
 
@@ -28,30 +28,80 @@ ${text}
 """
 
 Instructions for Extraction:
-1. Extract the business details and compile them into a clean JSON object.
-2. Translate any Hindi or Hinglish details into professional English (e.g. if the input is "dukan 9 baje khulti hai", map "hours" to "Mon - Sun: 9:00 AM - 9:00 PM").
+1. Extract the business details and compile them into a clean JSON object in clean, professional, local-business friendly English.
+2. Translate any Hindi or Hinglish details into professional English.
 3. Filter out voice filler words and ignore incomplete or trailing sentence fragments.
-4. Infer missing fields: If phone, hours, address, or services are missing, you MUST generate reasonable, plausible mock values based on the business type and description. Do not leave them as empty strings.
-5. The 'businessType' field MUST be classified into exactly one of these five styling categories:
-   - 'eatery': For restaurants, cafes, bakeries, grocery stores, food trucks, bistros, and dining spots.
-   - 'creative': For coaching centers, learning academies, design studios, tech agencies, software projects, and art setups.
-   - 'wellness': For gyms, fitness centers, yoga spaces, hair/beauty salons, spas, medical clinics, and dental clinics.
-   - 'professional': For repair shops, plumbers, electricians, mechanics, handymen, and legal/financial services.
-   - 'general': For electronics stores, supermarkets, retail shops, clothing boutiques, and any unclassified stores.
+4. Always return valid JSON matching the exact schema below.
+5. Infer missing fields: If phone, hours, address, or services are missing, you MUST generate reasonable, plausible mock values based on the business type and description. Do NOT leave them as empty strings or placeholders.
+6. Generate professional, copy-heavy marketing lines. Avoid generic placeholders. Make it sound publish-ready and local-business friendly.
+7. Classify the business into exactly one of these 9 'businessType' styling categories:
+   - 'restaurant': For restaurants, cafes, bakeries, food trucks, bistros, coffee shops, and dining spots.
+   - 'salon': For hair salons, beauty salons, nail spas, barbershops, wellness massage centers, and skin care clinics.
+   - 'repair_shop': For mobile phone repair shops, laptop repair shops, appliance services, mechanics, and local handymen.
+   - 'electronics_store': For gadget stores, home appliance retailers, mobile shops, computer sales, and electronics outlets.
+   - 'gym': For fitness centers, gym clubs, crossfit boxes, yoga spaces, pilates studios, and personal training facilities.
+   - 'clinic': For medical clinics, dental clinics, doctor consulting rooms, diagnostic centers, and health clinics.
+   - 'coaching': For coaching centers, tuition classes, learning academies, language centers, software training hubs, and music academies.
+   - 'retail_store': For clothing boutiques, shoe stores, grocery stores, supermarkets, flower shops, and general retail outlets.
+   - 'general': For general businesses, local agencies, and any company types not covered by the categories above.
 
-Return ONLY a JSON object conforming to the following structure. Do not include markdown blocks or pre/post commentaries.
-
-JSON Structure:
+JSON Structure Requirements:
 {
-  "businessName": "Name of the business (infer a creative name if missing)",
-  "description": "A polished, cohesive 2-3 sentence summary of the business in clean English, highlighting the core value proposition.",
-  "services": ["A list of up to 4 key services or products, translated into English and capitalized"],
-  "phone": "A clean phone number (format as (XXX) XXX-XXXX or Indian style +91 XXXXX XXXXX). Generate a plausible mock phone number if not found in text.",
-  "hours": "The operating hours (e.g. 'Mon - Sat: 9:00 AM - 8:00 PM'). Generate reasonable hours if not found in text.",
-  "address": "The physical address or location details. Generate a plausible street address if not found in text.",
-  "businessType": "Must be exactly one of: 'eatery', 'creative', 'wellness', 'professional', or 'general'"
+  "businessName": "Name of the business (infer a creative name based on the description if missing)",
+  "phone": "A clean phone number (format as (XXX) XXX-XXXX or Indian style +91 XXXXX XXXXX). Generate a mock phone number if not found.",
+  "hours": "The operating hours (e.g. 'Mon - Sat: 9:00 AM - 8:00 PM'). Generate reasonable hours if not found.",
+  "address": "The physical address or location details. Generate a plausible street address if not found.",
+  "businessType": "Must be exactly one of: 'restaurant', 'salon', 'repair_shop', 'electronics_store', 'gym', 'clinic', 'coaching', 'retail_store', or 'general'",
+  
+  "heroHeadline": "A conversion-focused, professional, SEO-friendly hero headline (e.g., 'Artisanal Sourdough & Freshly Roasted Coffee in Seattle' or 'Express Screen Replacement & Device Repair in Austin')",
+  "heroSubheadline": "A persuasive 1-2 sentence subheadline highlighting credentials, speed, or local quality (e.g., 'Serving locally roasted organic blends and home-baked pastries. Drop by for breakfast or order online today.')",
+  
+  "aboutText": "A professional about section description (2-3 sentences max) detailing the company mission, commitment to quality, and community roots.",
+  "ctaText": "Short action-oriented button copy (e.g., 'Book Table Now', 'Schedule Repair', 'Start Training', 'Book Consultation', 'Shop Collection')",
+  
+  "whyChooseUs": [
+    "Compelling reason 1 with active verb (e.g., 'Certified Technicians with 10+ years of repair experience')",
+    "Compelling reason 2 (e.g., '100% Satisfaction Guarantee on all plumbing installations')",
+    "Compelling reason 3 (e.g., 'Locally Sourced organic ingredients prepared fresh daily')"
+  ],
+  
+  "services": [
+    { "name": "Service/Product Title 1", "desc": "A brief 1-sentence description of the value provided." },
+    { "name": "Service/Product Title 2", "desc": "A brief 1-sentence description of the value provided." },
+    { "name": "Service/Product Title 3", "desc": "A brief 1-sentence description of the value provided." },
+    { "name": "Service/Product Title 4", "desc": "A brief 1-sentence description of the value provided." }
+  ],
+  
+  "testimonials": [
+    { "name": "Customer Name 1", "text": "Absolutely incredible service. Friendly, fast, and exceeded all my expectations!" },
+    { "name": "Customer Name 2", "text": "Professional staff and unbeatable quality. Highly recommend to everyone in the area." }
+  ],
+  
+  "industryDetails": {
+    "menuItems": [ // Used for 'restaurant'. Fill with 3 items if restaurant, otherwise return empty array.
+      { "name": "Signature Dish/Beverage 1", "price": "$12.99", "desc": "Tasty descriptive details of ingredients and preparation." },
+      { "name": "Signature Dish/Beverage 2", "price": "$9.49", "desc": "Tasty descriptive details of ingredients and preparation." },
+      { "name": "Signature Dish/Beverage 3", "price": "$14.99", "desc": "Tasty descriptive details of ingredients and preparation." }
+    ],
+    "pricingTiers": [ // Used for 'gym', 'salon', 'repair_shop', 'coaching'. Fill with 2 plans if applicable, otherwise empty array.
+      { "name": "Standard Package/Membership", "price": "$49/mo", "features": ["Feature details 1", "Feature details 2", "Feature details 3"] },
+      { "name": "Premium Package/Membership", "price": "$89/mo", "features": ["All standard features", "Exclusive VIP support", "Priority scheduling"] }
+    ],
+    "teamMembers": [ // Used for 'restaurant' (chefs), 'salon' (stylists), 'gym' (trainers), 'clinic' (doctors), 'coaching' (teachers). Fill with 2 names if applicable, otherwise empty array.
+      { "name": "Staff/Lead Name 1", "role": "Role (e.g., Head Chef, Master Barber, Senior Stylist, Lead Doctor, Physics Expert)" },
+      { "name": "Staff/Lead Name 2", "role": "Role (e.g., Pastry Chef, Hair Specialist, Fitness Coach, Dentist, Coding Tutor)" }
+    ],
+    "brands": [ // Used for 'repair_shop', 'electronics_store', 'retail_store'. List 4 brands/logos (e.g., ["Apple", "Samsung", "Google", "Dell"]).
+      "Brand A", "Brand B", "Brand C", "Brand D"
+    ],
+    "products": [ // Used for 'electronics_store', 'retail_store'. List 3 products with prices.
+      { "name": "Featured Product 1", "price": "$199.99", "desc": "Brief product specifications and value." },
+      { "name": "Featured Product 2", "price": "$79.99", "desc": "Brief product specifications and value." },
+      { "name": "Featured Product 3", "price": "$299.99", "desc": "Brief product specifications and value." }
+    ]
+  }
 }
-  `;
+`;
 
   let responseText = "";
   let apiError = null;
@@ -112,16 +162,46 @@ JSON Structure:
 
     const parsed = JSON.parse(cleanedText);
 
+    const validCategories = [
+      "restaurant",
+      "salon",
+      "repair_shop",
+      "electronics_store",
+      "gym",
+      "clinic",
+      "coaching",
+      "retail_store",
+      "general"
+    ];
+
     return {
       businessName: parsed.businessName || "My Business",
-      description: parsed.description || "A professional business providing high-quality services.",
-      services: Array.isArray(parsed.services) ? parsed.services.filter(s => typeof s === 'string' && s.trim() !== '') : [],
       phone: parsed.phone || "(555) 123-4567",
       hours: parsed.hours || "Mon - Sun: 9:00 AM - 6:00 PM",
       address: parsed.address || "123 Main Street, Cityville",
-      businessType: ["eatery", "creative", "wellness", "professional", "general"].includes(parsed.businessType)
+      businessType: validCategories.includes(parsed.businessType)
         ? parsed.businessType
-        : "general"
+        : "general",
+      heroHeadline: parsed.heroHeadline || "Premium Local Services",
+      heroSubheadline: parsed.heroSubheadline || "Dedicated quality and reliable support crafted exactly around your requirements.",
+      aboutText: parsed.aboutText || "We are a locally owned service committed to bringing you the highest standard of excellence. Our team pairs expert knowledge with friendly customer support.",
+      ctaText: parsed.ctaText || "Get In Touch",
+      whyChooseUs: Array.isArray(parsed.whyChooseUs) ? parsed.whyChooseUs : ["Experienced Professionals", "Customer-Centric Care", "100% Satisfaction Guarantee"],
+      services: Array.isArray(parsed.services) ? parsed.services : [
+        { "name": "Quality Support", "desc": "Customized plans designed to achieve target metrics." },
+        { "name": "Dedicated Craftsmanship", "desc": "Expert builders delivering prompt, reliable care." }
+      ],
+      testimonials: Array.isArray(parsed.testimonials) ? parsed.testimonials : [
+        { "name": "Sarah M.", "text": "Absolutely incredible service. Friendly, fast, and exceeded all my expectations!" },
+        { "name": "David K.", "text": "Professional staff and unbeatable quality. Highly recommend to everyone in the area." }
+      ],
+      industryDetails: parsed.industryDetails || {
+        menuItems: [],
+        pricingTiers: [],
+        teamMembers: [],
+        brands: [],
+        products: []
+      }
     };
   } catch (parseError) {
     console.error("JSON parsing failed for response:", responseText, parseError);
