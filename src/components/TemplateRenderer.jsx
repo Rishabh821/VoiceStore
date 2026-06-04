@@ -9,11 +9,6 @@ import {
 export default function TemplateRenderer({ data, variant = 1 }) {
   const { 
     businessName, phone, hours, address, category, accentColor,
-    heroHeadline: rawHeroHeadline, 
-    heroSubheadline: rawHeroSubheadline, 
-    aboutText: rawAboutText, 
-    ctaText: rawCtaText, 
-    whyChooseUs: rawWhyChooseUs,
     services, testimonials, industryDetails
   } = data;
 
@@ -21,17 +16,16 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   const variantKey = `v${variant}`;
   const variantCopy = data.variantsCopy?.[variantKey] || {};
 
-  const heroHeadline = variantCopy.heroHeadline || rawHeroHeadline || "Premium Local Services";
-  const heroSubheadline = variantCopy.heroSubheadline || rawHeroSubheadline || "Dedicated quality and reliable support crafted exactly around your requirements.";
-  const aboutText = variantCopy.aboutText || rawAboutText || "We are a locally owned service committed to bringing you the highest standard of excellence.";
-  const ctaText = variantCopy.ctaText || rawCtaText || "Get In Touch";
-  const whyChooseUs = Array.isArray(variantCopy.whyChooseUs) ? variantCopy.whyChooseUs : rawWhyChooseUs || ["Experienced Professionals", "Customer-Centric Care", "100% Satisfaction Guarantee"];
+  const heroHeadline = variantCopy.heroHeadline || data.heroHeadline || "Premium Local Services";
+  const heroSubheadline = variantCopy.heroSubheadline || data.heroSubheadline || "Dedicated quality and reliable support crafted exactly around your requirements.";
+  const aboutText = variantCopy.aboutText || data.aboutText || "We are a locally owned service committed to bringing you the highest standard of excellence.";
+  const ctaText = variantCopy.ctaText || data.ctaText || "Get In Touch";
+  const whyChooseUs = Array.isArray(variantCopy.whyChooseUs) ? variantCopy.whyChooseUs : data.whyChooseUs || ["Experienced Professionals", "Customer-Centric Care", "100% Satisfaction Guarantee"];
 
   // Form interactive state tracking
   const [formSubmitted, setFormSubmitted] = React.useState(false);
   const [bookingSubmitted, setBookingSubmitted] = React.useState(false);
   const [selectedService, setSelectedService] = React.useState("");
-
 
   // Dynamic high-quality photography placeholder imagery (from Unsplash)
   const images = {
@@ -332,7 +326,6 @@ export default function TemplateRenderer({ data, variant = 1 }) {
 
   // ----------------------------------------------------
   // INDUSTRY-SPECIFIC SECTIONS
-  // ----------------------------------------------------
   const renderIndustrySections = () => {
     // ----------------------------------------------------
     // 1. RESTAURANT CATEGORY
@@ -753,7 +746,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
         return (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left items-start">
             <div className="md:col-span-7 space-y-4">
-              <h3 className="text-lg font-bold uppercase text-slate-350">Quick Repair Estimates</h3>
+              <h3 className="text-lg font-bold uppercase text-slate-355">Quick Repair Estimates</h3>
               <div className="space-y-3">
                 {pricing.map((tier, idx) => (
                   <div key={idx} className={`p-3 rounded-lg bg-slate-900/60 border border-slate-800 flex justify-between items-center gap-4`}>
@@ -836,7 +829,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                 <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-slate-800 pb-2">
                   <div>
                     <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-300">{tier.name}</h4>
-                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{tier.features.join(" • ")}</p>
+                    <p className="text-[10px] text-slate-550 font-sans font-light leading-normal">{tier.features.join(" • ")}</p>
                   </div>
                   <span className="text-xs text-sky-400 font-sans">{tier.price}</span>
                 </div>
@@ -895,7 +888,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                   <p className="text-[10px] opacity-75 leading-relaxed">{prod.desc}</p>
                   <div className="flex justify-between items-center pt-2 border-t border-slate-800">
                     <span className="text-xs font-bold text-indigo-400">{prod.price}</span>
-                    <span className="text-[9px] text-slate-500 font-semibold">100% Certified / Brand Warranty</span>
+                    <span className="text-[9px] text-slate-555 font-semibold">100% Certified / Brand Warranty</span>
                   </div>
                 </div>
               ))}
@@ -907,7 +900,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       if (variant === 2) {
         return (
           <div className="space-y-6 text-left">
-            <h3 className="text-lg font-bold uppercase text-slate-350">Secure Product Stock Slot</h3>
+            <h3 className="text-lg font-bold uppercase text-slate-355">Secure Product Stock Slot</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {products.map((prod, idx) => (
                 <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} flex flex-col justify-between`}>
@@ -966,7 +959,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                 <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-slate-850 pb-2">
                   <div>
                     <h4 className="font-bold text-xs sm:text-sm tracking-wide text-slate-300">{prod.name}</h4>
-                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{prod.desc}</p>
+                    <p className="text-[10px] text-slate-550 font-sans font-light leading-normal">{prod.desc}</p>
                   </div>
                   <span className="text-xs text-indigo-400 font-sans">{prod.price}</span>
                 </div>
@@ -1107,7 +1100,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           <div className="space-y-6 font-serif max-w-xl mx-auto text-left">
             <div className="text-center space-y-1">
               <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Elite Personal Training & Access</span>
-              <h3 className="text-lg font-light text-zinc-350">Membership Tariff</h3>
+              <h3 className="text-lg font-light text-zinc-355">Membership Tariff</h3>
             </div>
             <div className="space-y-4">
               {plans.map((plan, idx) => (
@@ -1246,7 +1239,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
               <div className="p-4 bg-teal-50 border border-teal-100 rounded-xl space-y-2">
                 <span className="bg-teal-500/10 text-teal-700 text-[9px] font-extrabold px-2 py-0.5 rounded uppercase">Specialist</span>
                 <h4 className="font-bold text-xs text-slate-800">Diagnostic Consultations</h4>
-                <p className="text-[10px] text-teal-550">Complex medical checks, specialized pediatric care plans, and second opinions.</p>
+                <p className="text-[10px] text-slate-550">Complex medical checks, specialized pediatric care plans, and second opinions.</p>
               </div>
             </div>
           </div>
@@ -1383,7 +1376,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                 <div key={idx} className="flex justify-between items-baseline gap-4 border-b border-indigo-100 pb-2">
                   <div>
                     <h4 className="font-bold text-xs sm:text-sm tracking-wide text-indigo-900">{c.name}</h4>
-                    <p className="text-[10px] text-slate-500 font-sans font-light leading-normal">{c.desc}</p>
+                    <p className="text-[10px] text-slate-550 font-sans font-light leading-normal">{c.desc}</p>
                   </div>
                 </div>
               ))}
@@ -1454,7 +1447,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                 <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} flex flex-col justify-between`}>
                   <div className="space-y-2">
                     <h4 className="font-bold text-xs text-slate-850">{item.name}</h4>
-                    <p className="text-[10px] text-slate-500 leading-normal">{item.desc}</p>
+                    <p className="text-[10px] text-slate-555 leading-normal">{item.desc}</p>
                   </div>
                   <div className="mt-4 pt-2 border-t border-slate-250 flex justify-between items-center">
                     <span className="text-xs font-bold text-[#8b5a2b]">{item.price}</span>
@@ -1598,7 +1591,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     if (variant === 3) {
       return (
         <div className="p-6 bg-black/5 rounded-2xl max-w-xl mx-auto text-left space-y-4">
-          <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block text-center">Our Commitment</span>
+          <span className="text-[9px] uppercase tracking-widest text-slate-555 font-bold block text-center">Our Commitment</span>
           <h4 className="font-bold text-sm text-slate-800 text-center">"Crafting Values, Supporting Noida"</h4>
           <p className="text-xs opacity-75 leading-relaxed font-light font-sans text-center">We believe business should serve a community. From choosing sustainable suppliers to training apprentice teams, we work every day to deliver positive local impact.</p>
         </div>
@@ -1644,6 +1637,530 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     );
   };
 
+  // Testimonials Slider markup
+  const renderTestimonials = () => {
+    const list = testimonials?.length > 0 ? testimonials : [
+      { name: "Sarah M.", text: "Absolutely incredible service. Friendly, fast, and exceeded all my expectations!" },
+      { name: "David K.", text: "Professional staff and unbeatable quality. Highly recommend to everyone in the area." }
+    ];
+
+    return (
+      <div className="space-y-6 py-6 font-sans">
+        <div className="text-center">
+          <h3 className={`text-xl font-bold uppercase tracking-wider ${theme.fontDisplay}`}>What Our Clients Say</h3>
+          <div className="w-10 h-0.5 bg-current mx-auto opacity-20 mt-2" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {list.map((t, idx) => (
+            <div key={idx} className={`p-4 sm:p-6 rounded-2xl ${theme.cardBg} italic relative text-xs font-light leading-relaxed text-left break-words`}>
+              <span className="absolute top-2 left-3 text-3xl opacity-10 font-serif">“</span>
+              <p className="relative z-10 pt-2 opacity-90">"{t.text}"</p>
+              <h5 className="text-[10px] font-bold uppercase tracking-wider text-right mt-4 opacity-75">— {t.name}</h5>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // ----------------------------------------------------
+  // VARIANT 1: Basic & Functional (Stacked clean layout)
+  // ----------------------------------------------------
+  const renderBasic = () => {
+    return (
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
+        <div className="space-y-12 py-8 max-w-4xl mx-auto px-4 sm:px-6 text-left relative">
+          {renderConversionFloaters()}
+          
+          {/* Navigation */}
+          <div className="flex justify-between items-center pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
+            <h2 className="text-xl font-bold tracking-tight truncate">{businessName}</h2>
+            <div className="flex-shrink-0">
+              <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded text-xs font-bold transition-all ${theme.accentBg}`}>
+                Call Now
+              </a>
+            </div>
+          </div>
+
+          {/* Hero */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+            <div className="md:col-span-7 space-y-4 order-2 md:order-1">
+              <h1 className={`text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight ${theme.fontDisplay}`}>{heroHeadline}</h1>
+              <p className="text-sm opacity-80 leading-relaxed font-light">{heroSubheadline}</p>
+              <div className="pt-2">
+                <a href={`tel:${phone}`} className={`inline-flex px-5 py-3 min-h-[44px] items-center justify-center rounded text-sm font-semibold cursor-pointer ${theme.accentBg}`}>
+                  {ctaText}
+                </a>
+              </div>
+            </div>
+            <div className="md:col-span-5 rounded-2xl overflow-hidden shadow-lg border border-slate-350 dark:border-slate-800 order-1 md:order-2">
+              <img src={industryImages.hero} className="w-full h-48 object-cover" alt="Business Hero" />
+            </div>
+          </div>
+
+          {renderTrustBadges()}
+
+          {/* Services List */}
+          <div className="space-y-6">
+            <h3 className="text-lg font-bold border-l-4 border-current pl-3">Our Core Offerings</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {services.map((svc, i) => (
+                <div key={i} className="flex gap-3 text-left">
+                  <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${theme.accentText}`} />
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">{svc.name}</h4>
+                    <p className="text-xs opacity-75 font-light mt-0.5">{svc.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Industry specific sections */}
+          {renderIndustrySections()}
+
+          {/* Testimonials */}
+          {renderTestimonials()}
+
+          {/* About section */}
+          <div className="p-4 sm:p-6 bg-black/5 rounded-2xl space-y-3 text-left">
+            <h4 className="font-bold text-sm uppercase tracking-wider opacity-60">About Our Company</h4>
+            <p className="text-xs opacity-80 leading-relaxed font-light">{aboutText}</p>
+          </div>
+
+          {/* Essential Info Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs">
+            <div>
+              <h4 className="font-bold uppercase tracking-wider opacity-60 mb-1">Our Location</h4>
+              <p className="opacity-90 leading-relaxed">{address}</p>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase tracking-wider opacity-60 mb-1">Business Hours</h4>
+              <p className="opacity-90 leading-relaxed">{hours}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className={`py-6 text-center text-xs opacity-70 mt-12 px-6 ${theme.footerBg}`}>
+          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  };
+
+  // ----------------------------------------------------
+  // VARIANT 2: Professional (Corporate Split, Side Form)
+  // ----------------------------------------------------
+  const renderProfessional = () => {
+    return (
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
+        <div className="space-y-16 py-12 max-w-5xl mx-auto px-4 sm:px-6 text-left relative">
+          {renderConversionFloaters()}
+
+          {/* Navigation */}
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <BadgeIcon className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+              <h2 className="text-lg font-bold tracking-tight truncate">{businessName}</h2>
+            </div>
+            <div className="flex items-center gap-4 text-xs font-semibold flex-shrink-0">
+              <span className="opacity-75 hidden sm:inline">{hours}</span>
+              <a href={`tel:${phone}`} className={`px-4 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl transition-all ${theme.accentBg}`}>
+                Call Now
+              </a>
+            </div>
+          </div>
+
+          {/* Split Hero Column */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center pt-4">
+            <div className="md:col-span-7 space-y-6">
+              <span className="text-[10px] font-bold tracking-widest uppercase opacity-50 block">Certified Local Professional</span>
+              <h1 className={`text-3xl sm:text-4xl font-extrabold leading-tight ${theme.fontDisplay}`}>{heroHeadline}</h1>
+              <p className="text-sm opacity-85 leading-relaxed font-light">{heroSubheadline}</p>
+              <div className="flex flex-wrap gap-3">
+                <a href={`tel:${phone}`} className={`px-5 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-semibold text-xs cursor-pointer ${theme.accentBg}`}>
+                  {ctaText}
+                </a>
+                <a href="#pro-services" className={`px-5 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-semibold text-xs cursor-pointer ${theme.buttonSecondary}`}>
+                  Our Services
+                </a>
+              </div>
+            </div>
+
+            {/* Quick Mock Contact Form */}
+            <div className="md:col-span-5 bg-black/5 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500">Request Appointment Slot</h3>
+              <div className="space-y-3">
+                <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
+                <input type="email" placeholder="Your Email" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit focus:outline-none focus:border-indigo-500" />
+                <textarea placeholder="Tell us how we can assist you..." rows={3} className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded-lg px-3 py-2 text-xs text-inherit resize-none focus:outline-none focus:border-indigo-500" />
+                <button type="button" className={`w-full py-2.5 min-h-[44px] flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${theme.accentBg}`}>
+                  Book Consultation Slot
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {renderTrustBadges()}
+
+          {/* About segment */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center bg-black/5 p-4 sm:p-6 md:p-8 rounded-3xl">
+            <div className="md:col-span-4 rounded-2xl overflow-hidden border border-slate-800 shadow-md max-w-sm mx-auto w-full">
+              <img src={industryImages.feature} className="w-full h-48 object-cover" alt="Featured details" />
+            </div>
+            <div className="md:col-span-8 space-y-4 text-left">
+              <h4 className="font-bold text-sm uppercase tracking-wider text-slate-500 text-center md:text-left">Our Corporate Commitment</h4>
+              <p className="text-xs opacity-80 leading-relaxed font-light">{aboutText}</p>
+            </div>
+          </div>
+
+          {/* Services List */}
+          <div id="pro-services" className="space-y-6">
+            <h2 className="text-xl font-bold tracking-tight">Our Specialties & Services</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {services.map((svc, i) => (
+                <div key={i} className={`p-4 sm:p-5 rounded-xl ${theme.cardBg} text-left`}>
+                  <CheckCircle2 className={`w-5 h-5 mb-3 ${theme.accentText}`} />
+                  <h4 className="font-bold text-sm mb-1">{svc.name}</h4>
+                  <p className="text-xs opacity-75 font-light leading-relaxed">{svc.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Industry content */}
+          {renderIndustrySections()}
+
+          {/* Testimonials */}
+          {renderTestimonials()}
+
+          {/* Address and Info Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 p-4 sm:p-6 bg-black/5 rounded-2xl text-xs text-left">
+            <div className="flex gap-3">
+              <MapPin className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
+              <div>
+                <h5 className="font-bold uppercase tracking-wider opacity-60">Office Location</h5>
+                <p className="mt-1 leading-relaxed">{address}</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Clock className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
+              <div>
+                <h5 className="font-bold uppercase tracking-wider opacity-60">Working Hours</h5>
+                <p className="mt-1 leading-relaxed">{hours}</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Phone className={`w-5 h-5 flex-shrink-0 ${theme.accentText}`} />
+              <div>
+                <h5 className="font-bold uppercase tracking-wider opacity-60">Phone Support</h5>
+                <a href={`tel:${phone}`} className={`mt-1 block font-bold hover:underline ${theme.accentText}`}>{phone}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className={`py-8 text-center text-xs opacity-70 mt-12 px-6 ${theme.footerBg}`}>
+          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  };
+
+  // ----------------------------------------------------
+  // VARIANT 3: Modern (Centered layouts, Glows, Asymmetric)
+  // ----------------------------------------------------
+  const renderModern = () => {
+    return (
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between relative`}>
+        {/* Glow circles */}
+        <div className="absolute top-20 left-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative py-16 px-4 sm:px-6 max-w-5xl mx-auto text-center space-y-16 flex-1">
+          {renderConversionFloaters()}
+
+          {/* Header */}
+          <div className="flex justify-between items-center relative z-10 gap-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className={`p-1.5 rounded-lg ${theme.accentText} bg-opacity-10 bg-current flex-shrink-0`}>
+                <BadgeIcon className="w-4 h-4" />
+              </div>
+              <span className="font-bold tracking-wider uppercase text-xs truncate">{businessName}</span>
+            </div>
+            <div className="flex-shrink-0">
+              <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-semibold transition-all ${theme.accentBg}`}>
+                Connect Now
+              </a>
+            </div>
+          </div>
+
+          {/* Hero Area */}
+          <div className="max-w-2xl mx-auto space-y-6 relative z-10">
+            <span className={`text-[9px] tracking-widest font-bold uppercase px-3.5 py-1 rounded-full bg-current bg-opacity-10 ${theme.accentText} inline-block`}>
+              Highly Recommended Local Business
+            </span>
+            <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>{heroHeadline}</h1>
+            <p className="text-sm opacity-80 leading-relaxed font-light">{heroSubheadline}</p>
+            <div className="pt-4 flex justify-center">
+              <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${theme.accentBg}`}>
+                Call Us: {phone}
+              </a>
+            </div>
+          </div>
+
+          {/* Large visual card */}
+          <div className="rounded-3xl overflow-hidden border border-current border-opacity-10 shadow-2xl relative z-10 max-w-3xl mx-auto">
+            <img src={industryImages.hero} className="w-full h-64 object-cover" alt="Hero Details" />
+          </div>
+
+          {renderTrustBadges()}
+
+          {/* Services Showcase Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+            {services.map((svc, i) => (
+              <div key={i} className={`p-5 rounded-2xl transition-transform hover:-translate-y-1 duration-300 text-left ${theme.cardBg}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-4 ${theme.iconColor}`}>
+                  <span className="text-xs font-bold">{i + 1}</span>
+                </div>
+                <h4 className="font-bold text-sm tracking-tight mb-2">{svc.name}</h4>
+                <p className="text-[10px] opacity-75 leading-relaxed font-light">{svc.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Industry sections */}
+          {renderIndustrySections()}
+
+          {/* Testimonials */}
+          {renderTestimonials()}
+
+          {/* About Section */}
+          <div className="max-w-xl mx-auto text-center space-y-3 relative z-10">
+            <h4 className="text-xs uppercase tracking-widest font-bold opacity-60">Who We Are</h4>
+            <p className="text-xs opacity-80 font-light leading-relaxed">{aboutText}</p>
+          </div>
+
+          {/* Contact/Map Banner */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-light text-left p-4 sm:p-6 bg-black/5 rounded-2xl relative z-10 max-w-2xl mx-auto">
+            <div className="space-y-2">
+              <span className="text-[9px] uppercase tracking-wider opacity-60 font-bold">Physical Address Location</span>
+              <p className="font-medium text-sm leading-relaxed">{address}</p>
+            </div>
+            <div className="space-y-2">
+              <span className="text-[9px] uppercase tracking-wider opacity-60 font-bold">Hours & Contact Support</span>
+              <p className="font-medium text-sm leading-relaxed">{hours}</p>
+              <a href={`tel:${phone}`} className={`font-semibold block mt-1 hover:underline ${theme.accentText}`}>Call: {phone}</a>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className={`py-8 text-center text-xs opacity-70 px-6 z-10 relative ${theme.footerBg}`}>
+          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  };
+
+  // ----------------------------------------------------
+  // VARIANT 4: Premium (Boutique, Serif wide editorial)
+  // ----------------------------------------------------
+  const renderPremium = () => {
+    return (
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontDisplay} flex flex-col justify-between`}>
+        <div className="py-20 px-4 sm:px-8 max-w-4xl mx-auto text-center space-y-16 relative flex-1">
+          {renderConversionFloaters()}
+          
+          {/* Luxury Logo */}
+          <div className="space-y-2">
+            <h2 className="text-3xl font-light uppercase tracking-[0.2em] break-words">{businessName}</h2>
+            <div className="w-16 h-0.5 bg-current mx-auto opacity-30" />
+          </div>
+
+          {/* Fine Tagline & Description */}
+          <div className="space-y-6 max-w-2xl mx-auto">
+            <h1 className="text-3xl sm:text-4xl leading-tight font-light">{heroHeadline}</h1>
+            <p className="text-sm font-sans tracking-wide leading-relaxed font-light opacity-75">{heroSubheadline}</p>
+            <div className="pt-4 font-sans">
+              <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] inline-flex items-center justify-center rounded-full text-xs font-bold uppercase tracking-widest cursor-pointer ${theme.accentBg}`}>
+                {ctaText}
+              </a>
+            </div>
+          </div>
+
+          {/* Premium visual banner */}
+          <div className="rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-lg max-w-xl mx-auto">
+            <img src={industryImages.hero} className="w-full h-56 object-cover" alt="Boutique banner" />
+          </div>
+
+          {renderTrustBadges()}
+
+          {/* Luxury Services list */}
+          <div className="space-y-8 pt-6">
+            <h3 className="text-xs uppercase tracking-[0.3em] font-semibold text-slate-500">Our Curated Offerings</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-left font-sans">
+              {services.map((svc, i) => (
+                <div key={i} className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-start gap-4">
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-sm tracking-wide text-slate-800 dark:text-slate-200">{svc.name}</h4>
+                    <p className="text-xs opacity-60 font-light">{svc.desc}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Industry details */}
+          {renderIndustrySections()}
+
+          {/* Testimonials */}
+          {renderTestimonials()}
+
+          {/* Elegant About block */}
+          <div className="p-6 sm:p-8 border border-current border-opacity-10 rounded-2xl max-w-xl mx-auto text-left font-sans">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Our History & Values</h4>
+            <p className="text-xs opacity-75 font-light leading-relaxed">{aboutText}</p>
+          </div>
+
+          {/* Fine Details block */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-xs font-sans tracking-wider border-t border-current border-opacity-10 pt-8 text-left max-w-2xl mx-auto">
+            <div className="space-y-2">
+              <h5 className="font-bold uppercase tracking-widest text-slate-500">Our Location</h5>
+              <p className="opacity-80 font-light leading-relaxed">{address}</p>
+            </div>
+            <div className="space-y-2">
+              <h5 className="font-bold uppercase tracking-widest text-slate-500">Appointment Hours</h5>
+              <p className="opacity-80 font-light leading-relaxed">{hours}</p>
+              <p className="opacity-80 font-light mt-2">Direct support: <span className={`font-semibold ${theme.accentText}`}>{phone}</span></p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className={`py-10 text-center text-xs opacity-70 px-6 font-sans ${theme.footerBg}`}>
+          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  };
+
+  // ----------------------------------------------------
+  // VARIANT 5: Flagship (Asymmetric Layout, Large Showcase)
+  // ----------------------------------------------------
+  const renderFlagship = () => {
+    return (
+      <div className={`min-h-full w-full overflow-x-hidden ${theme.bg} ${theme.fontBody} flex flex-col justify-between`}>
+        <div className="py-16 px-4 sm:px-6 max-w-6xl mx-auto space-y-20 text-left relative flex-1">
+          {renderConversionFloaters()}
+          
+          {/* Navigation */}
+          <header className="flex justify-between items-center relative z-10 gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.accentBg}`}>
+                <BadgeIcon className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold tracking-tight text-lg truncate">{businessName}</span>
+            </div>
+            <div className="flex-shrink-0">
+              <a href={`tel:${phone}`} className={`px-5 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm tracking-tight transition-transform hover:-translate-y-0.5 ${theme.accentBg}`}>
+                Call
+              </a>
+            </div>
+          </header>
+
+          {/* Hero & Media split */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-opacity-10 border border-opacity-20 text-xs font-semibold tracking-wider uppercase ${theme.accentText} bg-current border-current`}>
+                <Award className="w-3.5 h-3.5" />
+                Premium Local Standards
+              </div>
+              <h1 className={`text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none ${theme.fontDisplay}`}>
+                {heroHeadline}
+              </h1>
+              <p className="text-sm opacity-85 leading-relaxed font-light">{heroSubheadline}</p>
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                <a href={`tel:${phone}`} className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${theme.accentBg}`}>
+                  {ctaText}
+                </a>
+                <a href="#flagship-details" className={`px-6 py-3 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer ${theme.buttonSecondary}`}>
+                  Explore Offerings
+                </a>
+              </div>
+            </div>
+
+            {/* Graphics Showcase Block */}
+            <div className="lg:col-span-5 relative max-w-md mx-auto w-full">
+              <div className={`p-4 sm:p-6 rounded-3xl border border-current border-opacity-10 ${theme.cardBg} shadow-xl relative overflow-hidden`}>
+                <img src={industryImages.hero} className="w-full h-44 object-cover rounded-xl border border-current border-opacity-10" alt="Showcase hero" />
+                <h3 className="font-bold text-xs mt-4 uppercase tracking-wider text-slate-500 mb-2">Our Company Bio</h3>
+                <p className="text-xs opacity-75 font-light leading-relaxed">{aboutText}</p>
+              </div>
+            </div>
+          </div>
+
+          {renderTrustBadges()}
+
+          {/* Flagship Services Grid */}
+          <div id="flagship-details" className="space-y-8 relative z-10">
+            <div className="text-center max-w-xl mx-auto space-y-2">
+              <h2 className="text-2xl font-black text-center">Services & Offerings</h2>
+              <p className="text-xs opacity-75">Every service is crafted with high quality specifications to deliver premium results.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {services.map((svc, i) => (
+                <div key={i} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
+                  <div className="space-y-4">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${theme.iconColor}`}>
+                      <CheckCircle2 className="w-4.5 h-4.5" />
+                    </div>
+                    <h4 className="font-bold text-sm tracking-tight text-slate-800 dark:text-slate-200">{svc.name}</h4>
+                    <p className="text-[11px] opacity-75 font-light leading-relaxed">{svc.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Industry specific sections */}
+          {renderIndustrySections()}
+
+          {/* Testimonials */}
+          {renderTestimonials()}
+
+          {/* Contact/Map Banner details */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 p-4 sm:p-8 bg-black/5 rounded-3xl text-xs relative z-10 text-left">
+            <div className="space-y-2">
+              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Physical Address</span>
+              <p className="font-bold text-sm leading-relaxed">{address}</p>
+              <p className="text-slate-550 mt-1 leading-normal">Walk-in visits are fully welcomed during hours.</p>
+            </div>
+            <div className="space-y-2">
+              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Operational Timings</span>
+              <p className="font-bold text-sm leading-relaxed">{hours}</p>
+              <p className="text-slate-550 mt-1 leading-normal">Support channels are open online 24/7.</p>
+            </div>
+            <div className="space-y-2">
+              <span className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">Instant Dial Connection</span>
+              <a href={`tel:${phone}`} className="font-bold text-sm text-indigo-500 block hover:underline">{phone}</a>
+              <p className="text-slate-550 mt-1 leading-normal">Call for query assistance or instant quote bookings.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className={`py-10 text-center text-xs opacity-70 px-6 ${theme.footerBg}`}>
+          <p>© {new Date().getFullYear()} {businessName}. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  };
+
   // Switch between variants
   switch (Number(variant)) {
     case 1:
@@ -1657,6 +2174,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     case 5:
       return renderFlagship();
     default:
+      console.warn(`Unknown variant "${variant}" requested. Falling back to Variant 1 (renderBasic).`);
       return renderBasic();
   }
 }
