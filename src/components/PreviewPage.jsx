@@ -396,13 +396,13 @@ export default function PreviewPage({ data, onBack, onUpdateData, onRetry }) {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setViewMode('selection')}
-                className="flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-xs font-semibold py-2 px-3 hover:bg-slate-800/40 rounded-xl cursor-pointer"
+                className="flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-xs font-semibold py-1.5 px-2.5 hover:bg-slate-800/40 rounded-xl cursor-pointer"
               >
                 <LayoutGrid className="w-4 h-4" />
-                <span>Gallery</span>
+                <span className="hidden sm:inline">Gallery</span>
               </button>
-              <div className="h-4 w-px bg-slate-800" />
-              <div className="flex items-center gap-1.5 text-xs text-slate-300">
+              <div className="hidden md:block h-4 w-px bg-slate-800" />
+              <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-300">
                 <span className="font-semibold text-slate-400">Concept:</span>
                 <span className="font-bold text-white bg-slate-900 border border-slate-800 px-2.5 py-0.5 rounded-lg">
                   {selectedConcept.name}
@@ -453,33 +453,36 @@ export default function PreviewPage({ data, onBack, onUpdateData, onRetry }) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2 border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl text-xs font-semibold transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 border border-indigo-500/20 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl text-xs font-semibold transition-all duration-300 cursor-pointer"
+                title="Customize Website"
               >
                 <Sliders className="w-3.5 h-3.5" />
-                <span>Customize Website</span>
+                <span className="hidden sm:inline">Customize</span>
               </button>
 
               <button
                 onClick={handlePublish}
-                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-500/15 hover:shadow-emerald-500/25 transition-all hover:translate-y-[-1px] active:translate-y-0 cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-500/15 hover:shadow-emerald-500/25 transition-all hover:translate-y-[-1px] active:translate-y-0 cursor-pointer"
+                title="Publish Website"
               >
                 <Globe className="w-3.5 h-3.5" />
-                <span>Publish Website</span>
+                <span className="hidden sm:inline">Publish</span>
               </button>
 
               <button
                 onClick={handleCopyCode}
-                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all hover:translate-y-[-1px] active:translate-y-0 cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all hover:translate-y-[-1px] active:translate-y-0 cursor-pointer"
+                title="Export Code"
               >
                 {copied ? (
                   <>
                     <Check className="w-3.5 h-3.5" />
-                    <span>Copied!</span>
+                    <span className="hidden sm:inline">Copied!</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Export Code</span>
+                    <span className="hidden sm:inline">Export</span>
                   </>
                 )}
               </button>

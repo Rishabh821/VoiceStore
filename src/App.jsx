@@ -135,7 +135,7 @@ export default function App() {
               window.history.replaceState({}, document.title, window.location.pathname);
               setPage('landing');
             }}
-            className="px-5 py-2.5 bg-indigo-650 hover:bg-indigo-555 rounded-xl text-xs font-bold transition-all shadow-md mt-2 cursor-pointer"
+            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-xs font-bold transition-all shadow-md mt-2 cursor-pointer"
           >
             Create Your Own Website
           </button>

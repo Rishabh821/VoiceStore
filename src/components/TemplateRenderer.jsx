@@ -110,8 +110,8 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       accentBg: "bg-amber-700 hover:bg-amber-800 text-white",
       cardBg: "bg-white border border-amber-100 shadow-sm hover:shadow-md transition-shadow",
       iconColor: "text-amber-700 bg-amber-50",
-      buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-55/50",
-      footerBg: "bg-amber-955 text-amber-100/80 border-t border-amber-900/20",
+      buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-50/50",
+      footerBg: "bg-amber-905 text-amber-100/80 border-t border-amber-900/20",
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: Coffee
@@ -124,7 +124,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       cardBg: "bg-white border border-amber-100 shadow-sm hover:shadow-md transition-shadow",
       iconColor: "text-amber-800 bg-amber-50",
       buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-50/50",
-      footerBg: "bg-[#1b100a] text-amber-100/70 border-t border-amber-955",
+      footerBg: "bg-[#1b100a] text-amber-100/70 border-t border-amber-900/40",
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: Coffee
@@ -133,11 +133,11 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       bg: "bg-[#fffafc] text-[#3c1d29]",
       headerBg: "bg-rose-900/5 border-b border-rose-900/10",
       accentText: "text-rose-700",
-      accentBg: "bg-rose-600 hover:bg-rose-750 text-white",
+      accentBg: "bg-rose-600 hover:bg-rose-700 text-white",
       cardBg: "bg-white border border-rose-100 shadow-sm hover:shadow-md transition-shadow",
-      iconColor: "text-rose-755 bg-rose-50",
+      iconColor: "text-rose-700 bg-rose-50",
       buttonSecondary: "border border-rose-700 text-rose-900 hover:bg-rose-50/50",
-      footerBg: "bg-rose-955 text-[#fdeff4] border-t border-rose-900/20",
+      footerBg: "bg-rose-950 text-[#fdeff4] border-t border-rose-900/20",
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: Palette
@@ -150,20 +150,20 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       cardBg: "bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors",
       iconColor: "text-orange-500 bg-orange-950/40",
       buttonSecondary: "border border-zinc-700 text-zinc-300 hover:bg-zinc-800",
-      footerBg: "bg-zinc-955 text-zinc-500 border-t border-zinc-900",
+      footerBg: "bg-zinc-900 text-zinc-500 border-t border-zinc-800",
       fontDisplay: "font-sans font-black tracking-tighter uppercase",
       fontBody: "font-sans",
       badgeIcon: Activity
     },
     clinic: {
       bg: "bg-[#f4faf8] text-[#1e3d36]",
-      headerBg: "bg-teal-955/5 border-b border-teal-900/10",
+      headerBg: "bg-teal-900/5 border-b border-teal-900/10",
       accentText: "text-teal-700",
       accentBg: "bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-500/10",
       cardBg: "bg-white border border-teal-100 hover:border-teal-200 transition-all shadow-sm",
       iconColor: "text-teal-700 bg-teal-50",
       buttonSecondary: "border border-teal-600 text-teal-800 hover:bg-teal-50/50",
-      footerBg: "bg-teal-955 text-teal-100/70 border-t border-teal-900/15",
+      footerBg: "bg-teal-950 text-teal-100/70 border-t border-teal-900/15",
       fontDisplay: "font-sans font-bold",
       fontBody: "font-sans",
       badgeIcon: ShieldCheck
@@ -171,12 +171,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     coaching_center: {
       bg: "bg-[#faf9fc] text-[#2c1d3c]",
       headerBg: "bg-indigo-950/5 border-b border-indigo-900/10",
-      accentText: "text-indigo-755",
-      accentBg: "bg-indigo-650 hover:bg-indigo-750 text-white shadow-md shadow-indigo-500/10",
+      accentText: "text-indigo-700",
+      accentBg: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/10",
       cardBg: "bg-white border border-indigo-100 hover:border-indigo-200 transition-all shadow-sm",
-      iconColor: "text-indigo-755 bg-indigo-50",
-      buttonSecondary: "border border-indigo-600 text-indigo-855 hover:bg-indigo-50/50",
-      footerBg: "bg-indigo-955 text-indigo-100/70 border-t border-indigo-900/15",
+      iconColor: "text-indigo-700 bg-indigo-50",
+      buttonSecondary: "border border-indigo-600 text-indigo-800 hover:bg-indigo-50/50",
+      footerBg: "bg-indigo-950 text-indigo-100/70 border-t border-indigo-900/15",
       fontDisplay: "font-sans font-extrabold tracking-tight",
       fontBody: "font-sans",
       badgeIcon: GraduationCap
@@ -209,7 +209,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     },
     electronics_store: {
       bg: "bg-[#05070e] text-slate-300",
-      headerBg: "bg-slate-955/80 border-b border-slate-900",
+      headerBg: "bg-slate-900/80 border-b border-slate-900",
       accentText: "text-indigo-400",
       accentBg: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/20",
       cardBg: "bg-[#0f1324] border border-slate-800 hover:border-indigo-900/50 transition-all",
@@ -228,7 +228,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       cardBg: "bg-white border border-blue-100 hover:border-blue-200 transition-all shadow-sm",
       iconColor: "text-blue-700 bg-blue-50",
       buttonSecondary: "border border-blue-600 text-blue-800 hover:bg-blue-50/50",
-      footerBg: "bg-blue-955 text-blue-100/80 border-t border-blue-900/20",
+      footerBg: "bg-blue-950 text-blue-100/80 border-t border-blue-900/20",
       fontDisplay: "font-sans font-bold",
       fontBody: "font-sans",
       badgeIcon: Wrench
@@ -239,7 +239,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       accentText: "text-amber-500",
       accentBg: "bg-amber-600 hover:bg-amber-500 text-black shadow-lg shadow-amber-500/10",
       cardBg: "bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors",
-      iconColor: "text-amber-550 bg-amber-955/40",
+      iconColor: "text-amber-500 bg-amber-950/40",
       buttonSecondary: "border border-zinc-700 text-zinc-300 hover:bg-zinc-800",
       footerBg: "bg-zinc-950 text-zinc-500 border-t border-zinc-900",
       fontDisplay: "font-sans font-black tracking-tighter uppercase",
@@ -248,26 +248,26 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     },
     hvac: {
       bg: "bg-[#f5fbfd] text-slate-850",
-      headerBg: "bg-sky-955/5 border-b border-sky-900/10",
+      headerBg: "bg-sky-900/5 border-b border-sky-900/10",
       accentText: "text-sky-700",
       accentBg: "bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-500/10",
       cardBg: "bg-white border border-sky-100 hover:border-sky-200 transition-all shadow-sm",
       iconColor: "text-sky-700 bg-sky-50",
-      buttonSecondary: "border border-sky-600 text-sky-850 hover:bg-sky-55/50",
-      footerBg: "bg-sky-955 text-sky-100/70 border-t border-sky-900/15",
+      buttonSecondary: "border border-sky-600 text-sky-800 hover:bg-sky-50/50",
+      footerBg: "bg-sky-950 text-sky-100/70 border-t border-sky-900/15",
       fontDisplay: "font-sans font-bold",
       fontBody: "font-sans",
       badgeIcon: Wind
     },
     home_services: {
       bg: "bg-[#f7faf6] text-[#223e1e]",
-      headerBg: "bg-emerald-955/5 border-b border-emerald-900/10",
+      headerBg: "bg-emerald-900/5 border-b border-emerald-900/10",
       accentText: "text-emerald-700",
       accentBg: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/10",
       cardBg: "bg-white border border-emerald-100 hover:border-emerald-200 transition-all shadow-sm",
       iconColor: "text-emerald-700 bg-emerald-50",
-      buttonSecondary: "border border-emerald-600 text-emerald-850 hover:bg-emerald-55/50",
-      footerBg: "bg-emerald-955 text-emerald-100/70 border-t border-emerald-900/15",
+      buttonSecondary: "border border-emerald-600 text-emerald-800 hover:bg-emerald-50/50",
+      footerBg: "bg-emerald-950 text-emerald-100/70 border-t border-emerald-900/15",
       fontDisplay: "font-sans font-bold",
       fontBody: "font-sans",
       badgeIcon: Home
@@ -303,34 +303,34 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   // Custom accent color overrides
   const colorOverrides = {
     indigo: {
-      accentText: "text-indigo-655 dark:text-indigo-400",
+      accentText: "text-indigo-600 dark:text-indigo-400",
       accentBg: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/10",
-      iconColor: "text-indigo-655 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/40",
-      buttonSecondary: "border border-indigo-600 text-indigo-855 dark:text-indigo-300 hover:bg-indigo-50/50"
+      iconColor: "text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/40",
+      buttonSecondary: "border border-indigo-600 text-indigo-800 dark:text-indigo-300 hover:bg-indigo-50/50"
     },
     amber: {
-      accentText: "text-amber-850 dark:text-amber-400",
+      accentText: "text-amber-700 dark:text-amber-400",
       accentBg: "bg-amber-700 hover:bg-amber-800 text-white shadow-md shadow-amber-500/10",
-      iconColor: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-955/40",
-      buttonSecondary: "border border-amber-700 text-amber-855 dark:text-amber-300 hover:bg-amber-55/50"
+      iconColor: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/40",
+      buttonSecondary: "border border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-50/50"
     },
     emerald: {
       accentText: "text-emerald-700 dark:text-emerald-400",
       accentBg: "bg-emerald-700 hover:bg-emerald-800 text-white shadow-md shadow-emerald-500/10",
-      iconColor: "text-emerald-755 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-955/40",
-      buttonSecondary: "border border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-55/50"
+      iconColor: "text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/40",
+      buttonSecondary: "border border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50/50"
     },
     rose: {
-      accentText: "text-rose-600 dark:text-rose-450",
+      accentText: "text-rose-600 dark:text-rose-400",
       accentBg: "bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-500/10",
-      iconColor: "text-rose-600 bg-rose-50 dark:text-rose-455 dark:bg-rose-955/40",
-      buttonSecondary: "border border-rose-600 text-rose-750 dark:text-rose-350 hover:bg-rose-50/50"
+      iconColor: "text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-900/40",
+      buttonSecondary: "border border-rose-600 text-rose-700 dark:text-rose-300 hover:bg-rose-50/50"
     },
     sky: {
-      accentText: "text-sky-655 dark:text-sky-400",
+      accentText: "text-sky-600 dark:text-sky-400",
       accentBg: "bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-500/10",
-      iconColor: "text-sky-655 bg-sky-50 dark:text-sky-400 dark:bg-sky-955/40",
-      buttonSecondary: "border border-sky-600 text-sky-750 dark:text-sky-300 hover:bg-sky-50/50"
+      iconColor: "text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-900/40",
+      buttonSecondary: "border border-sky-600 text-sky-700 dark:text-sky-300 hover:bg-sky-50/50"
     }
   };
 
@@ -390,7 +390,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       {/* Call Button */}
       <a 
         href={`tel:${phone}`} 
-        className="flex items-center gap-2 bg-indigo-650 hover:bg-indigo-555 text-white px-4 py-3 min-h-[44px] rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 min-h-[44px] rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
         title="Call Directly"
       >
         <Phone className="w-5 h-5 fill-white text-indigo-600" />
@@ -643,8 +643,8 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       if (variant === 1) {
         return (
           <div className="space-y-6">
-            <div className="text-left border-l-4 border-rose-655 pl-3">
-              <span className="text-[9px] uppercase tracking-wider font-bold text-rose-655">Satisfaction Guaranteed Services</span>
+            <div className="text-left border-l-4 border-rose-600 pl-3">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-rose-600">Satisfaction Guaranteed Services</span>
               <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Premium Beauty Services</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1016,7 +1016,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                         setSelectedService(`Reserve: ${prod.name}`);
                         document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="px-2 py-1 min-h-[30px] rounded text-[9px] font-bold text-white bg-indigo-650 hover:bg-indigo-555"
+                      className="px-2 py-1 min-h-[30px] rounded text-[9px] font-bold text-white bg-indigo-600 hover:bg-indigo-700"
                     >
                       Reserve Slot
                     </button>
@@ -1408,7 +1408,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                         setSelectedService(`Trial: ${course.name}`);
                         document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="px-3 py-1.5 min-h-[30px] rounded text-[9px] font-bold text-white bg-indigo-650 hover:bg-indigo-750 flex-shrink-0"
+                      className="px-3 py-1.5 min-h-[30px] rounded text-[9px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 flex-shrink-0"
                     >
                       Book Trial Class
                     </button>
@@ -1432,7 +1432,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
                   </select>
                   <button 
                     onClick={() => setBookingSubmitted(true)}
-                    className="w-full py-2 min-h-[38px] rounded text-xs font-bold text-white bg-indigo-650 hover:bg-indigo-750"
+                    className="w-full py-2 min-h-[38px] rounded text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700"
                   >
                     Confirm Registration Slot
                   </button>
@@ -1489,7 +1489,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       if (variant === 5) {
         return (
           <div className="space-y-6 text-left">
-            <h3 className="text-xl font-bold font-sans text-indigo-955">Curriculum Catalog</h3>
+            <h3 className="text-xl font-bold font-sans text-indigo-900">Curriculum Catalog</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
               {courses.map((c, idx) => (
                 <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg}`}>
