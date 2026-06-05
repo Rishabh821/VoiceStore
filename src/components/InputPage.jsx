@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sparkles, ArrowLeft, Wand2, Coffee, Palette, ShieldAlert, HeartHandshake, Mic, MicOff, Settings, Upload, Image, Trash2 } from 'lucide-react';
 
 const SAMPLES = [
@@ -153,7 +153,9 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
-        } catch (e) {}
+        } catch {
+          // ignore stop errors
+        }
         recognitionRef.current = null;
       }
       setIsListening(false);
@@ -227,7 +229,9 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
     if (isListening && recognitionRef.current) {
       try {
         recognitionRef.current.stop();
-      } catch (e) {}
+      } catch {
+        // ignore stop errors
+      }
       recognitionRef.current = null;
       setIsListening(false);
     }
@@ -250,14 +254,14 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
     const minTimePromise = new Promise((resolve) => setTimeout(resolve, 4000));
 
     try {
-      const [success] = await Promise.all([
+      await Promise.all([
         onGenerate(description, uploadedImages),
         minTimePromise
       ]);
 
       clearInterval(interval);
       setIsGenerating(false);
-    } catch (err) {
+    } catch {
       clearInterval(interval);
       setIsGenerating(false);
     }

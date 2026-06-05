@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  Phone, Clock, MapPin, CheckCircle2, ChevronRight, Star, Heart, 
-  ShieldCheck, ShoppingBag, Coffee, Palette, Calendar, MessageSquare, 
-  Send, Users, Award, ExternalLink, Activity, Sparkles, MessageCircle, Laptop,
-  HelpCircle, GraduationCap, Check, ArrowRight, Wrench, Zap, Wind, Home, Briefcase
+import {
+  Phone, Clock, MapPin, CheckCircle2, ChevronRight, Star,
+  ShieldCheck, ShoppingBag, Coffee, Palette,
+  Award, Activity, MessageCircle, Laptop,
+  GraduationCap, Check, Wrench, Zap, Wind, Home, Briefcase
 } from 'lucide-react';
 
 export default function TemplateRenderer({ data, variant = 1 }) {
@@ -20,12 +20,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
   const heroSubheadline = variantCopy.heroSubheadline || data.heroSubheadline || "Dedicated quality and reliable support crafted exactly around your requirements.";
   const aboutText = variantCopy.aboutText || data.aboutText || "We are a locally owned service committed to bringing you the highest standard of excellence.";
   const ctaText = variantCopy.ctaText || data.ctaText || "Get In Touch";
-  const whyChooseUs = Array.isArray(variantCopy.whyChooseUs) ? variantCopy.whyChooseUs : data.whyChooseUs || ["Experienced Professionals", "Customer-Centric Care", "100% Satisfaction Guarantee"];
-
   // Form interactive state tracking
-  const [formSubmitted, setFormSubmitted] = React.useState(false);
   const [bookingSubmitted, setBookingSubmitted] = React.useState(false);
-  const [selectedService, setSelectedService] = React.useState("");
+  const [, setSelectedService] = React.useState("");
 
   // Dynamic high-quality photography placeholder imagery (from Unsplash)
   const images = {

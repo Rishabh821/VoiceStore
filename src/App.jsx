@@ -21,14 +21,6 @@ export default function App() {
 
   const [publishedVariant, setPublishedVariant] = useState(1);
 
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const siteId = urlParams.get('site');
-    if (siteId) {
-      loadPublishedSite(siteId);
-    }
-  }, []);
-
   const loadPublishedSite = async (id) => {
     setPage('loading-published');
     setError(null);
@@ -46,6 +38,14 @@ export default function App() {
       setPage('error-published');
     }
   };
+
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const siteId = urlParams.get('site');
+    if (siteId) {
+      loadPublishedSite(siteId);
+    }
+  }, []);
 
   const handleCreateClick = () => {
     setError(null);

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sparkles, ArrowRight, Monitor, Laptop, Smartphone, Wand2 } from 'lucide-react';
 
 export default function LandingPage({ onCreateClick }) {

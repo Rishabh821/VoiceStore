@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  ArrowLeft, Monitor, Tablet, Smartphone, Sparkles, Plus, 
-  Trash2, Copy, Check, ChevronRight, Edit3, X, Sliders, LayoutGrid,
-  Globe, Loader2, AlertTriangle, CheckCircle2, ExternalLink
+import {
+  ArrowLeft, Sparkles, Plus,
+  Trash2, Copy, Check, ChevronRight, X, Sliders, LayoutGrid,
+  Globe, AlertTriangle, CheckCircle2, ExternalLink
 } from 'lucide-react';
 import TemplateRenderer from './TemplateRenderer';
 import { saveBusinessWebsite } from '../lib/supabase';
@@ -45,43 +45,48 @@ const CONCEPTS = [
   }
 ];
 
-// Confetti Component for Celebratory Success Screen
-const Confetti = () => {
-  const colors = [
-    'bg-[#6366f1]', // Indigo
-    'bg-[#a855f7]', // Purple
-    'bg-[#ec4899]', // Pink
-    'bg-[#10b981]', // Emerald
-    'bg-[#f59e0b]', // Amber
-    'bg-[#0ea5e9]'  // Sky
-  ];
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
-      {Array.from({ length: 45 }).map((_, i) => {
-        const size = Math.random() * 8 + 4; // 4px to 12px
-        const left = Math.random() * 100; // 0% to 100%
-        const delay = Math.random() * 2; // 0s to 2s
-        const duration = Math.random() * 2.5 + 2.5; // 2.5s to 5s
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        return (
-          <div
-            key={i}
-            className={`absolute rounded-sm ${color} animate-confetti-fall`}
-            style={{
-              width: `${size}px`,
-              height: `${size * (Math.random() * 1.5 + 0.5)}px`,
-              left: `${left}%`,
-              top: `-20px`,
-              animationDelay: `${delay}s`,
-              animationDuration: `${duration}s`,
-              opacity: Math.random() * 0.8 + 0.2,
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-};
+const COLORS = [
+  'bg-[#6366f1]',
+  'bg-[#a855f7]',
+  'bg-[#ec4899]',
+  'bg-[#10b981]',
+  'bg-[#f59e0b]',
+  'bg-[#0ea5e9]'
+];
+
+const CONFETTI_PARTICLES = Array.from({ length: 45 }).map((_, i) => {
+  const size = Math.random() * 8 + 4;
+  return {
+    i,
+    size,
+    left: Math.random() * 100,
+    delay: Math.random() * 2,
+    duration: Math.random() * 2.5 + 2.5,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    height: size * (Math.random() * 1.5 + 0.5),
+    opacity: Math.random() * 0.8 + 0.2,
+  };
+});
+
+const Confetti = () => (
+  <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
+    {CONFETTI_PARTICLES.map(({ i, size, left, delay, duration, color, height, opacity }) => (
+      <div
+        key={i}
+        className={`absolute rounded-sm ${color} animate-confetti-fall`}
+        style={{
+          width: `${size}px`,
+          height: `${height}px`,
+          left: `${left}%`,
+          top: `-20px`,
+          animationDelay: `${delay}s`,
+          animationDuration: `${duration}s`,
+          opacity,
+        }}
+      />
+    ))}
+  </div>
+);
 
 export default function PreviewPage({ data, onBack, onUpdateData, onRetry }) {
   const [viewMode, setViewMode] = useState('selection'); // 'selection' or 'preview'

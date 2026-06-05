@@ -339,7 +339,7 @@ JSON Structure Requirements:
 }
 
 // Helper builder to generate high-quality default variant copy configurations
-function makeDefaultVariantsCopy(bizName, matchedCat) {
+function makeDefaultVariantsCopy(bizName) {
   return {
     v1: {
       heroHeadline: `Trusted ${bizName} - Local Specialists`,
