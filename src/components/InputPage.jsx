@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, ArrowLeft, Wand2, Coffee, Palette, ShieldAlert, HeartHandshake, Mic, MicOff, Settings } from 'lucide-react';
+import { Sparkles, ArrowLeft, Wand2, Coffee, Palette, ShieldAlert, HeartHandshake, Mic, MicOff, Settings, Upload, Image, Trash2 } from 'lucide-react';
 
 const SAMPLES = [
   {
@@ -48,6 +48,54 @@ const SAMPLES = [
 
 export default function InputPage({ onBack, onGenerate, error, onClearError }) {
   const [description, setDescription] = useState("");
+  
+  // Optional Image Uploads State
+  const [uploadedImages, setUploadedImages] = useState({
+    logo: null,
+    storefront: null,
+    products: []
+  });
+
+  const handleFileUpload = (type, files) => {
+    if (!files || files.length === 0) return;
+    
+    if (type === 'logo' || type === 'storefront') {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImages(prev => ({
+          ...prev,
+          [type]: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    } else if (type === 'products') {
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setUploadedImages(prev => ({
+            ...prev,
+            products: [...prev.products, reader.result].slice(0, 6) // Max 6 images
+          }));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const removeImage = (type, index = null) => {
+    if (type === 'logo' || type === 'storefront') {
+      setUploadedImages(prev => ({
+        ...prev,
+        [type]: null
+      }));
+    } else if (type === 'products') {
+      setUploadedImages(prev => ({
+        ...prev,
+        products: prev.products.filter((_, i) => i !== index)
+      }));
+    }
+  };
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   
@@ -189,7 +237,7 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
 
     try {
       const [success] = await Promise.all([
-        onGenerate(description),
+        onGenerate(description, uploadedImages),
         minTimePromise
       ]);
 
@@ -348,6 +396,129 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
                     </div>
 
                   </div>
+                </div>
+
+                {/* Optional Image Uploads Component */}
+                <div className="rounded-2xl glass p-5 border border-slate-750/60 shadow-xl space-y-4 text-left">
+                  <div className="flex items-center gap-2 border-b border-slate-800/60 pb-2.5">
+                    <Image className="w-4.5 h-4.5 text-indigo-400" />
+                    <div>
+                      <h4 className="font-bold text-sm text-slate-200">Image Assets (Optional)</h4>
+                      <p className="text-[10px] text-slate-500">Add your logo or photos to personalize your generated site</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Logo Upload Dropzone */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Business Logo</label>
+                      {uploadedImages.logo ? (
+                        <div className="relative w-20 h-20 bg-slate-900/60 border border-slate-750 rounded-2xl flex items-center justify-center p-2 group">
+                          <img src={uploadedImages.logo} className="w-full h-full object-contain rounded-xl" alt="Logo Preview" />
+                          <button 
+                            type="button"
+                            onClick={() => removeImage('logo')}
+                            className="absolute -top-1.5 -right-1.5 p-1 bg-rose-600 hover:bg-rose-500 rounded-full text-white shadow shadow-black/50 transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div 
+                          className="h-20 bg-slate-900/40 border border-dashed border-slate-800 hover:border-indigo-500/50 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative"
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            handleFileUpload('logo', e.dataTransfer.files);
+                          }}
+                        >
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload('logo', e.target.files)}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          <Upload className="w-4 h-4 text-slate-500 mb-1" />
+                          <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wider">Upload Logo</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Storefront Upload Dropzone */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Storefront / Hero Photo</label>
+                      {uploadedImages.storefront ? (
+                        <div className="relative h-20 bg-slate-900/60 border border-slate-750 rounded-2xl flex items-center justify-center overflow-hidden group">
+                          <img src={uploadedImages.storefront} className="w-full h-full object-cover" alt="Storefront Preview" />
+                          <button 
+                            type="button"
+                            onClick={() => removeImage('storefront')}
+                            className="absolute top-1.5 right-1.5 p-1 bg-rose-600 hover:bg-rose-500 rounded-full text-white shadow shadow-black/50 transition-colors z-10 cursor-pointer"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div 
+                          className="h-20 bg-slate-900/40 border border-dashed border-slate-800 hover:border-indigo-500/50 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative"
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            handleFileUpload('storefront', e.dataTransfer.files);
+                          }}
+                        >
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload('storefront', e.target.files)}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          <Upload className="w-4 h-4 text-slate-500 mb-1" />
+                          <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wider">Upload Storefront</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Products / Services Gallery Dropzone */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Product & Service Photos (Max 6)</label>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                      {uploadedImages.products.map((img, index) => (
+                        <div key={index} className="relative aspect-square bg-slate-900/60 border border-slate-750 rounded-xl overflow-hidden group">
+                          <img src={img} className="w-full h-full object-cover" alt={`Product ${index + 1}`} />
+                          <button 
+                            type="button"
+                            onClick={() => removeImage('products', index)}
+                            className="absolute top-1 right-1 p-0.5 bg-rose-600 hover:bg-rose-500 rounded-full text-white shadow transition-colors z-10 cursor-pointer"
+                          >
+                            <Trash2 className="w-2.5 h-2.5" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {uploadedImages.products.length < 6 && (
+                        <div 
+                          className="aspect-square bg-slate-900/40 border border-dashed border-slate-800 hover:border-indigo-500/50 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative"
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            handleFileUpload('products', e.dataTransfer.files);
+                          }}
+                        >
+                          <input 
+                            type="file" 
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload('products', e.target.files)}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          <Upload className="w-3.5 h-3.5 text-slate-500" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                 </div>
 
                 <button

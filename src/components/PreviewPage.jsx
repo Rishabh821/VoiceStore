@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { 
   ArrowLeft, Monitor, Tablet, Smartphone, Sparkles, Plus, 
-  Trash2, Copy, Check, ChevronRight, Edit3, X, Sliders, LayoutGrid 
+  Trash2, Copy, Check, ChevronRight, Edit3, X, Sliders, LayoutGrid,
+  Globe, Loader2, AlertTriangle, CheckCircle2, ExternalLink
 } from 'lucide-react';
 import TemplateRenderer from './TemplateRenderer';
+import { saveBusinessWebsite } from '../lib/supabase';
 
 const CONCEPTS = [
   { 
@@ -43,13 +45,168 @@ const CONCEPTS = [
   }
 ];
 
-export default function PreviewPage({ data, onBack, onUpdateData }) {
+// Confetti Component for Celebratory Success Screen
+const Confetti = () => {
+  const colors = [
+    'bg-[#6366f1]', // Indigo
+    'bg-[#a855f7]', // Purple
+    'bg-[#ec4899]', // Pink
+    'bg-[#10b981]', // Emerald
+    'bg-[#f59e0b]', // Amber
+    'bg-[#0ea5e9]'  // Sky
+  ];
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
+      {Array.from({ length: 45 }).map((_, i) => {
+        const size = Math.random() * 8 + 4; // 4px to 12px
+        const left = Math.random() * 100; // 0% to 100%
+        const delay = Math.random() * 2; // 0s to 2s
+        const duration = Math.random() * 2.5 + 2.5; // 2.5s to 5s
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        return (
+          <div
+            key={i}
+            className={`absolute rounded-sm ${color} animate-confetti-fall`}
+            style={{
+              width: `${size}px`,
+              height: `${size * (Math.random() * 1.5 + 0.5)}px`,
+              left: `${left}%`,
+              top: `-20px`,
+              animationDelay: `${delay}s`,
+              animationDuration: `${duration}s`,
+              opacity: Math.random() * 0.8 + 0.2,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+export default function PreviewPage({ data, onBack, onUpdateData, onRetry }) {
   const [viewMode, setViewMode] = useState('selection'); // 'selection' or 'preview'
   const [selectedConcept, setSelectedConcept] = useState(CONCEPTS[0]);
   const [viewport, setViewport] = useState('desktop'); // 'desktop', 'tablet', 'mobile375', 'mobile390', 'mobile430'
   const [copied, setCopied] = useState(false);
   const [newServiceText, setNewServiceText] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const [cooldown, setCooldown] = useState(data.cooldownSeconds || 0);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  // Supabase Publishing states
+  const [isPublishingModalOpen, setIsPublishingModalOpen] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
+  const [publishError, setPublishError] = useState(null);
+  const [publishedId, setPublishedId] = useState(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // Toast notification state
+  const [toast, setToast] = useState({ show: false, message: "" });
+
+  const showToastNotification = (msg) => {
+    setToast({ show: true, message: msg });
+    setTimeout(() => {
+      setToast({ show: false, message: "" });
+    }, 4000);
+  };
+
+  const getCleanShareUrl = (id) => {
+    if (!id) return '';
+    const origin = window.location.origin;
+    let pathname = window.location.pathname || '/';
+    // Clean index.html if present
+    if (pathname.endsWith('index.html')) {
+      pathname = pathname.slice(0, -10);
+    }
+    // Ensure pathname ends with a slash
+    if (!pathname.endsWith('/')) {
+      pathname += '/';
+    }
+    return `${origin}${pathname}?site=${id}`;
+  };
+
+  const handlePublish = async () => {
+    setPublishLoading(true);
+    setPublishError(null);
+    setPublishedId(null);
+    setIsPublishingModalOpen(true);
+    try {
+      const siteId = await saveBusinessWebsite(data, selectedConcept.variantId);
+      setPublishedId(siteId);
+      showToastNotification("Website published successfully.");
+    } catch (err) {
+      console.error("Publishing error:", err);
+      setPublishError(err.message || "Something went wrong while publishing your website.");
+    } finally {
+      setPublishLoading(false);
+    }
+  };
+
+  // Sync cooldown from prop updates if they happen
+  React.useEffect(() => {
+    setCooldown(data.cooldownSeconds || 0);
+  }, [data.cooldownSeconds]);
+
+  React.useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown(prev => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  const handleRetryClick = async () => {
+    if (cooldown > 0 || isRetrying) return;
+    setIsRetrying(true);
+    try {
+      if (onRetry) {
+        await onRetry();
+      }
+    } catch (e) {
+      console.error("Regeneration error:", e);
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
+  const renderQuotaBanner = () => {
+    // Only show if fallback generation was used
+    if (data.generationMethod !== 'fallback') return null;
+
+    const bannerText = data.isQuotaError
+      ? "AI generation is temporarily unavailable due to usage limits. A simplified website was generated instead."
+      : "A simplified website was generated locally because no AI key is configured.";
+
+    return (
+      <div className="w-full bg-amber-600/95 text-white border-b border-amber-500 py-3.5 px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs z-40 relative backdrop-blur-md shadow-lg animate-fade-in font-sans">
+        <div className="flex items-center gap-2">
+          <span className="bg-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+            Fallback Mode
+          </span>
+          <span className="font-semibold text-slate-100">{bannerText}</span>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={handleRetryClick}
+            disabled={cooldown > 0 || isRetrying}
+            className="flex items-center gap-1.5 px-4 py-2 bg-white text-amber-950 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold transition-all shadow-sm cursor-pointer min-h-[36px]"
+          >
+            {isRetrying ? (
+              <>
+                <span className="w-3.5 h-3.5 border-2 border-amber-950 border-t-transparent rounded-full animate-spin" />
+                <span>Generating...</span>
+              </>
+            ) : cooldown > 0 ? (
+              <span>Retry in {cooldown}s</span>
+            ) : (
+              <span>Retry with AI</span>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   // Quick handlers to modify field data
   const handleFieldChange = (field, value) => {
@@ -132,6 +289,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
       {/* ---------------------------------------------------- */}
       {viewMode === 'selection' && (
         <div className="flex-1 overflow-y-auto px-6 py-12 flex flex-col justify-between relative">
+          {renderQuotaBanner()}
           {/* Background lights */}
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-900/10 rounded-full blur-[120px] pointer-events-none" />
@@ -231,6 +389,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
       {/* ---------------------------------------------------- */}
       {viewMode === 'preview' && (
         <div className="flex-1 flex flex-col overflow-hidden relative">
+          {renderQuotaBanner()}
           
           {/* Minimal Floating Top Control Navbar */}
           <nav className="h-16 border-b border-slate-900 flex items-center justify-between px-4 sm:px-6 bg-[#090b15]/95 backdrop-blur-md flex-shrink-0 z-35">
@@ -301,6 +460,14 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
               </button>
 
               <button
+                onClick={handlePublish}
+                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-500/15 hover:shadow-emerald-500/25 transition-all hover:translate-y-[-1px] active:translate-y-0 cursor-pointer"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>Publish Website</span>
+              </button>
+
+              <button
                 onClick={handleCopyCode}
                 className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all hover:translate-y-[-1px] active:translate-y-0 cursor-pointer"
               >
@@ -326,6 +493,7 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
             <div className="h-[88%] w-[90%] md:w-[85%] flex items-center justify-center transition-all duration-500 pb-4">
               <div 
                 className={`h-full flex flex-col bg-white text-slate-800 transition-all duration-300 shadow-2xl relative ${viewportWidths[viewport]}`}
+                style={{ transform: 'translate3d(0, 0, 0)' }}
               >
                 {/* Browser bar top decoration for tablet and mobile */}
                 {viewport !== 'desktop' && (
@@ -436,15 +604,21 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
                       onChange={(e) => handleFieldChange('category', e.target.value)}
                       className="w-full bg-[#13192a] border border-slate-800 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-indigo-500/80 transition-colors cursor-pointer text-slate-300"
                     >
-                      <option value="restaurant">🍕 Restaurant & Cafe (Serif, Warm)</option>
+                      <option value="restaurant">🍕 Restaurant (Serif, Warm)</option>
+                      <option value="cafe">☕ Cafe & Coffee Shop (Serif Warm)</option>
                       <option value="salon">✂️ Beauty & Hair Salon (Rose Soft)</option>
-                      <option value="repair_shop">🔧 Mobile & Laptop Repair Shop (Carbon Slate)</option>
-                      <option value="electronics_store">💻 Electronics & Gadget Store (Cyber Dark)</option>
                       <option value="gym">🏋️ Gym & Fitness Center (High-Contrast Bold)</option>
                       <option value="clinic">🩺 Medical & Dental Clinic (Teal Clean)</option>
-                      <option value="coaching">🎓 Coaching & Tuition Center (Indigo Academic)</option>
+                      <option value="coaching_center">🎓 Coaching & Tuition Center (Indigo Academic)</option>
                       <option value="retail_store">🛍️ Retail Boutique & Store (Minimalist Copper)</option>
-                      <option value="general">💼 General Local Business (Corporate Slate)</option>
+                      <option value="mobile_repair">📱 Mobile & Laptop Repair (Carbon Slate)</option>
+                      <option value="electronics_store">💻 Electronics & Gadget Store (Cyber Dark)</option>
+                      <option value="plumbing">🚰 Plumbing Services (Blue Trust)</option>
+                      <option value="electrician">⚡ Electrician Services (Amber Sporty)</option>
+                      <option value="hvac">❄️ HVAC & Heating Services (Sky Fresh)</option>
+                      <option value="home_services">🏡 Home Services & Cleaning (Emerald Organic)</option>
+                      <option value="professional_services">💼 Professional Services (Corporate Serif)</option>
+                      <option value="general">🌐 General Local Business (Corporate Slate)</option>
                     </select>
                   </div>
 
@@ -642,6 +816,177 @@ export default function PreviewPage({ data, onBack, onUpdateData }) {
             </>
           )}
 
+        </div>
+      )}
+
+      {/* ---------------------------------------------------- */}
+      {/* PUBLISHING MODAL OVERLAY */}
+      {/* ---------------------------------------------------- */}
+      {isPublishingModalOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            onClick={!publishLoading ? () => setIsPublishingModalOpen(false) : undefined}
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 transition-opacity duration-300 animate-fade-in"
+          />
+          
+          {/* Modal Container */}
+          <div className="fixed inset-0 z-55 flex items-center justify-center p-4">
+            <div className="w-full max-w-md bg-[#0d1124] border border-slate-800 rounded-2xl shadow-2xl p-6 transition-all duration-300 relative overflow-hidden animate-scale-in">
+              {/* Background gradient flare */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500" />
+              
+              {/* Close Button (disabled while loading) */}
+              {!publishLoading && (
+                <button
+                  onClick={() => setIsPublishingModalOpen(false)}
+                  className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/60 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+
+              {publishLoading && (
+                <div className="flex flex-col items-center text-center space-y-5 py-6">
+                  <div className="relative w-14 h-14">
+                    <div className="absolute inset-0 rounded-full border-4 border-slate-800" />
+                    <div className="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-white tracking-wide">Publishing Website</h3>
+                    <p className="text-[11px] text-slate-400 max-w-[280px] leading-relaxed">
+                      Saving your database record and preparing a shareable site URL...
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {publishError && !publishLoading && (
+                <div className="flex flex-col items-center text-center space-y-4 py-2">
+                  <div className="w-14 h-14 rounded-full bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-455">
+                    <AlertTriangle className="w-6.5 h-6.5" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-bold text-white tracking-wide">Publishing Failed</h3>
+                    <p className="text-xs text-rose-300 max-w-[320px] leading-relaxed break-words font-medium">
+                      {publishError}
+                    </p>
+                  </div>
+                  <div className="w-full flex items-center gap-3 pt-4 border-t border-slate-900 mt-2">
+                    <button
+                      onClick={() => setIsPublishingModalOpen(false)}
+                      className="flex-1 px-4 py-2 border border-slate-800 hover:bg-slate-800 text-slate-350 rounded-xl text-xs font-semibold transition-colors cursor-pointer min-h-[38px]"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handlePublish}
+                      className="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold transition-colors shadow-lg shadow-rose-650/10 cursor-pointer min-h-[38px]"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {publishedId && !publishLoading && !publishError && (
+                <div className="flex flex-col items-center text-center space-y-5 py-2 relative">
+                  {/* Confetti Rain */}
+                  <Confetti />
+
+                  {/* Celebratory badge */}
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/35 flex items-center justify-center text-emerald-450 shadow-lg shadow-emerald-500/5 relative z-10 animate-bounce">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+
+                  <div className="space-y-1 relative z-10">
+                    <h3 className="text-xl font-display font-extrabold tracking-tight text-white bg-gradient-to-r from-white via-slate-100 to-emerald-450 bg-clip-text text-transparent">
+                      Published Successfully
+                    </h3>
+                    <p className="text-xs text-slate-400 max-w-[280px] leading-relaxed mx-auto">
+                      Your business website is now officially live on the internet!
+                    </p>
+                  </div>
+
+                  {/* Live link card */}
+                  <div className="w-full bg-[#13192a]/80 border border-slate-800 rounded-2xl p-3 text-left space-y-1 relative z-10">
+                    <span className="text-[9px] uppercase tracking-wider font-semibold text-slate-500 block pl-1">Live URL</span>
+                    <div className="text-[11px] text-indigo-300 truncate font-mono select-all px-1">
+                      {getCleanShareUrl(publishedId)}
+                    </div>
+                  </div>
+
+                  {/* Open Website and Copy Link Buttons */}
+                  <div className="w-full flex flex-col sm:flex-row gap-3 relative z-10">
+                    <button
+                      onClick={() => {
+                        const url = getCleanShareUrl(publishedId);
+                        navigator.clipboard.writeText(url);
+                        setLinkCopied(true);
+                        setTimeout(() => setLinkCopied(false), 2000);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700/60 text-slate-200 rounded-xl text-xs font-semibold shadow-md transition-all active:scale-[0.98] cursor-pointer min-h-[40px]"
+                    >
+                      {linkCopied ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-450" />
+                          <span className="text-emerald-400">Link Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy Link</span>
+                        </>
+                      )}
+                    </button>
+
+                    <a
+                      href={getCleanShareUrl(publishedId)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-500/10 transition-all active:scale-[0.98] cursor-pointer min-h-[40px]"
+                    >
+                      <span>Open Website</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  {/* QR Code Container */}
+                  <div className="w-full flex flex-col items-center bg-[#13192a]/50 border border-slate-800/80 rounded-2xl p-4 gap-2.5 relative z-10">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Scan to view on mobile</span>
+                    <div className="bg-white p-2 rounded-xl shadow-xl border border-slate-200">
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(getCleanShareUrl(publishedId))}&color=0d1124&bgcolor=ffffff`} 
+                        alt="QR Code" 
+                        className="w-32 h-32 select-none"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Done / Close footer action */}
+                  <div className="w-full pt-3 border-t border-slate-900 relative z-10 flex justify-end">
+                    <button
+                      onClick={() => setIsPublishingModalOpen(false)}
+                      className="px-5 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-350 rounded-xl text-xs font-bold transition-all cursor-pointer min-h-[36px]"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className="fixed bottom-6 right-6 z-60 animate-slide-in-right flex items-center gap-3 bg-[#0d1124]/95 border border-emerald-500/30 text-white px-4 py-3.5 rounded-xl shadow-2xl backdrop-blur-md max-w-sm">
+          <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
+            <Check className="w-3.5 h-3.5" />
+          </div>
+          <p className="text-xs font-semibold tracking-wide text-slate-200">{toast.message}</p>
         </div>
       )}
 

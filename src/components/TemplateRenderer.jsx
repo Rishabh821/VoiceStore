@@ -3,7 +3,7 @@ import {
   Phone, Clock, MapPin, CheckCircle2, ChevronRight, Star, Heart, 
   ShieldCheck, ShoppingBag, Coffee, Palette, Calendar, MessageSquare, 
   Send, Users, Award, ExternalLink, Activity, Sparkles, MessageCircle, Laptop,
-  HelpCircle, GraduationCap, Check, ArrowRight
+  HelpCircle, GraduationCap, Check, ArrowRight, Wrench, Zap, Wind, Home, Briefcase
 } from 'lucide-react';
 
 export default function TemplateRenderer({ data, variant = 1 }) {
@@ -76,7 +76,30 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     }
   };
 
-  const industryImages = images[category] || images.general;
+  const resolvedCategory = (() => {
+    if (category === 'coaching') return 'coaching_center';
+    if (category === 'repair_shop') return 'mobile_repair';
+    return category;
+  })();
+
+  const baseIndustryImages = images[resolvedCategory] || images.general;
+  const uploadedImages = data.uploadedImages || {};
+
+  // Prioritize uploaded storefront/product images over industry placeholders
+  const industryImages = {
+    hero: uploadedImages.storefront || baseIndustryImages.hero,
+    feature: uploadedImages.products?.[0] || uploadedImages.storefront || baseIndustryImages.feature,
+    staff: uploadedImages.products?.[1] || baseIndustryImages.staff
+  };
+
+  const renderLogoAndName = (className = "text-xl font-bold tracking-tight truncate", containerClassName = "flex items-center gap-2 min-w-0") => (
+    <div className={containerClassName}>
+      {uploadedImages.logo && (
+        <img src={uploadedImages.logo} className="h-7 w-7 rounded-full object-cover flex-shrink-0 border border-current border-opacity-10 shadow-sm" alt="Logo" />
+      )}
+      <span className={className}>{businessName}</span>
+    </div>
+  );
 
   // Theme styling definitions for categories
   const themeConfig = {
@@ -87,8 +110,21 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       accentBg: "bg-amber-700 hover:bg-amber-800 text-white",
       cardBg: "bg-white border border-amber-100 shadow-sm hover:shadow-md transition-shadow",
       iconColor: "text-amber-700 bg-amber-50",
-      buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-50/50",
+      buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-55/50",
       footerBg: "bg-amber-955 text-amber-100/80 border-t border-amber-900/20",
+      fontDisplay: "font-serif",
+      fontBody: "font-sans",
+      badgeIcon: Coffee
+    },
+    cafe: {
+      bg: "bg-[#fcf8f2] text-[#3e2723]",
+      headerBg: "bg-amber-950/5 border-b border-amber-900/10",
+      accentText: "text-amber-900",
+      accentBg: "bg-amber-800 hover:bg-amber-900 text-white",
+      cardBg: "bg-white border border-amber-100 shadow-sm hover:shadow-md transition-shadow",
+      iconColor: "text-amber-800 bg-amber-50",
+      buttonSecondary: "border border-amber-800 text-amber-900 hover:bg-amber-50/50",
+      footerBg: "bg-[#1b100a] text-amber-100/70 border-t border-amber-955",
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: Coffee
@@ -99,38 +135,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       accentText: "text-rose-700",
       accentBg: "bg-rose-600 hover:bg-rose-750 text-white",
       cardBg: "bg-white border border-rose-100 shadow-sm hover:shadow-md transition-shadow",
-      iconColor: "text-rose-750 bg-rose-50",
+      iconColor: "text-rose-755 bg-rose-50",
       buttonSecondary: "border border-rose-700 text-rose-900 hover:bg-rose-50/50",
       footerBg: "bg-rose-955 text-[#fdeff4] border-t border-rose-900/20",
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: Palette
-    },
-    repair_shop: {
-      bg: "bg-[#0b0f19] text-slate-300",
-      headerBg: "bg-slate-900/60 border-b border-slate-800/80",
-      accentText: "text-sky-400",
-      accentBg: "bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-500/20",
-      cardBg: "bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-colors",
-      iconColor: "text-sky-400 bg-sky-950/60",
-      buttonSecondary: "border border-slate-700 text-slate-300 hover:bg-slate-800",
-      footerBg: "bg-slate-950 text-slate-500 border-t border-slate-900",
-      fontDisplay: "font-mono",
-      fontBody: "font-sans",
-      badgeIcon: Laptop
-    },
-    electronics_store: {
-      bg: "bg-[#05070e] text-slate-300",
-      headerBg: "bg-slate-950/80 border-b border-slate-900",
-      accentText: "text-indigo-400",
-      accentBg: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/20",
-      cardBg: "bg-[#0f1324] border border-slate-800 hover:border-indigo-900/50 transition-all",
-      iconColor: "text-indigo-400 bg-indigo-950/80",
-      buttonSecondary: "border border-slate-800 text-slate-300 hover:bg-slate-900",
-      footerBg: "bg-slate-950 text-slate-500 border-t border-slate-900",
-      fontDisplay: "font-sans font-extrabold tracking-tight",
-      fontBody: "font-sans",
-      badgeIcon: ShoppingBag
     },
     gym: {
       bg: "bg-[#09090b] text-[#f4f4f5]",
@@ -140,14 +150,14 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       cardBg: "bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors",
       iconColor: "text-orange-500 bg-orange-950/40",
       buttonSecondary: "border border-zinc-700 text-zinc-300 hover:bg-zinc-800",
-      footerBg: "bg-zinc-950 text-zinc-500 border-t border-zinc-900",
+      footerBg: "bg-zinc-955 text-zinc-500 border-t border-zinc-900",
       fontDisplay: "font-sans font-black tracking-tighter uppercase",
       fontBody: "font-sans",
       badgeIcon: Activity
     },
     clinic: {
       bg: "bg-[#f4faf8] text-[#1e3d36]",
-      headerBg: "bg-teal-950/5 border-b border-teal-900/10",
+      headerBg: "bg-teal-955/5 border-b border-teal-900/10",
       accentText: "text-teal-700",
       accentBg: "bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-500/10",
       cardBg: "bg-white border border-teal-100 hover:border-teal-200 transition-all shadow-sm",
@@ -158,13 +168,13 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       fontBody: "font-sans",
       badgeIcon: ShieldCheck
     },
-    coaching: {
+    coaching_center: {
       bg: "bg-[#faf9fc] text-[#2c1d3c]",
       headerBg: "bg-indigo-950/5 border-b border-indigo-900/10",
-      accentText: "text-indigo-750",
+      accentText: "text-indigo-755",
       accentBg: "bg-indigo-650 hover:bg-indigo-750 text-white shadow-md shadow-indigo-500/10",
       cardBg: "bg-white border border-indigo-100 hover:border-indigo-200 transition-all shadow-sm",
-      iconColor: "text-indigo-750 bg-indigo-50",
+      iconColor: "text-indigo-755 bg-indigo-50",
       buttonSecondary: "border border-indigo-600 text-indigo-855 hover:bg-indigo-50/50",
       footerBg: "bg-indigo-955 text-indigo-100/70 border-t border-indigo-900/15",
       fontDisplay: "font-sans font-extrabold tracking-tight",
@@ -183,6 +193,97 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       fontDisplay: "font-serif",
       fontBody: "font-sans",
       badgeIcon: ShoppingBag
+    },
+    mobile_repair: {
+      bg: "bg-[#0b0f19] text-slate-300",
+      headerBg: "bg-slate-900/60 border-b border-slate-800/80",
+      accentText: "text-sky-400",
+      accentBg: "bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-500/20",
+      cardBg: "bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-colors",
+      iconColor: "text-sky-400 bg-sky-950/60",
+      buttonSecondary: "border border-slate-700 text-slate-300 hover:bg-slate-800",
+      footerBg: "bg-slate-950 text-slate-500 border-t border-slate-900",
+      fontDisplay: "font-mono",
+      fontBody: "font-sans",
+      badgeIcon: Laptop
+    },
+    electronics_store: {
+      bg: "bg-[#05070e] text-slate-300",
+      headerBg: "bg-slate-955/80 border-b border-slate-900",
+      accentText: "text-indigo-400",
+      accentBg: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/20",
+      cardBg: "bg-[#0f1324] border border-slate-800 hover:border-indigo-900/50 transition-all",
+      iconColor: "text-indigo-400 bg-indigo-950/80",
+      buttonSecondary: "border border-slate-800 text-slate-300 hover:bg-slate-900",
+      footerBg: "bg-slate-950 text-slate-500 border-t border-slate-900",
+      fontDisplay: "font-sans font-extrabold tracking-tight",
+      fontBody: "font-sans",
+      badgeIcon: ShoppingBag
+    },
+    plumbing: {
+      bg: "bg-[#f4f7fc] text-slate-850",
+      headerBg: "bg-blue-900/5 border-b border-blue-900/10",
+      accentText: "text-blue-700",
+      accentBg: "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/10",
+      cardBg: "bg-white border border-blue-100 hover:border-blue-200 transition-all shadow-sm",
+      iconColor: "text-blue-700 bg-blue-50",
+      buttonSecondary: "border border-blue-600 text-blue-800 hover:bg-blue-50/50",
+      footerBg: "bg-blue-955 text-blue-100/80 border-t border-blue-900/20",
+      fontDisplay: "font-sans font-bold",
+      fontBody: "font-sans",
+      badgeIcon: Wrench
+    },
+    electrician: {
+      bg: "bg-[#09090b] text-[#f4f4f5]",
+      headerBg: "bg-zinc-900/80 border-b border-zinc-800",
+      accentText: "text-amber-500",
+      accentBg: "bg-amber-600 hover:bg-amber-500 text-black shadow-lg shadow-amber-500/10",
+      cardBg: "bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors",
+      iconColor: "text-amber-550 bg-amber-955/40",
+      buttonSecondary: "border border-zinc-700 text-zinc-300 hover:bg-zinc-800",
+      footerBg: "bg-zinc-950 text-zinc-500 border-t border-zinc-900",
+      fontDisplay: "font-sans font-black tracking-tighter uppercase",
+      fontBody: "font-sans",
+      badgeIcon: Zap
+    },
+    hvac: {
+      bg: "bg-[#f5fbfd] text-slate-850",
+      headerBg: "bg-sky-955/5 border-b border-sky-900/10",
+      accentText: "text-sky-700",
+      accentBg: "bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-500/10",
+      cardBg: "bg-white border border-sky-100 hover:border-sky-200 transition-all shadow-sm",
+      iconColor: "text-sky-700 bg-sky-50",
+      buttonSecondary: "border border-sky-600 text-sky-850 hover:bg-sky-55/50",
+      footerBg: "bg-sky-955 text-sky-100/70 border-t border-sky-900/15",
+      fontDisplay: "font-sans font-bold",
+      fontBody: "font-sans",
+      badgeIcon: Wind
+    },
+    home_services: {
+      bg: "bg-[#f7faf6] text-[#223e1e]",
+      headerBg: "bg-emerald-955/5 border-b border-emerald-900/10",
+      accentText: "text-emerald-700",
+      accentBg: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/10",
+      cardBg: "bg-white border border-emerald-100 hover:border-emerald-200 transition-all shadow-sm",
+      iconColor: "text-emerald-700 bg-emerald-50",
+      buttonSecondary: "border border-emerald-600 text-emerald-850 hover:bg-emerald-55/50",
+      footerBg: "bg-emerald-955 text-emerald-100/70 border-t border-emerald-900/15",
+      fontDisplay: "font-sans font-bold",
+      fontBody: "font-sans",
+      badgeIcon: Home
+    },
+    professional_services: {
+      bg: "bg-[#fafafc] text-slate-900",
+      headerBg: "bg-slate-950/5 border-b border-slate-900/10",
+      accentText: "text-slate-800",
+      accentBg: "bg-slate-800 hover:bg-slate-900 text-white shadow-md",
+      cardBg: "bg-white border border-slate-200 hover:border-slate-350 transition-all shadow-sm",
+      iconColor: "text-slate-800 bg-slate-50",
+      buttonSecondary: "border border-slate-850 text-slate-900 hover:bg-slate-50",
+      footerBg: "bg-slate-900 text-slate-300 border-t border-slate-850",
+      fontDisplay: "font-serif",
+      fontBody: "font-sans",
+      badgeIcon: Briefcase
     },
     general: {
       bg: "bg-slate-50 text-slate-900",
@@ -211,13 +312,13 @@ export default function TemplateRenderer({ data, variant = 1 }) {
       accentText: "text-amber-850 dark:text-amber-400",
       accentBg: "bg-amber-700 hover:bg-amber-800 text-white shadow-md shadow-amber-500/10",
       iconColor: "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-955/40",
-      buttonSecondary: "border border-amber-700 text-amber-855 dark:text-amber-300 hover:bg-amber-50/50"
+      buttonSecondary: "border border-amber-700 text-amber-855 dark:text-amber-300 hover:bg-amber-55/50"
     },
     emerald: {
       accentText: "text-emerald-700 dark:text-emerald-400",
       accentBg: "bg-emerald-700 hover:bg-emerald-800 text-white shadow-md shadow-emerald-500/10",
-      iconColor: "text-emerald-750 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-955/40",
-      buttonSecondary: "border border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50/50"
+      iconColor: "text-emerald-755 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-955/40",
+      buttonSecondary: "border border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-55/50"
     },
     rose: {
       accentText: "text-rose-600 dark:text-rose-450",
@@ -233,7 +334,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     }
   };
 
-  const baseTheme = themeConfig[category] || themeConfig.general;
+  const baseTheme = themeConfig[resolvedCategory] || themeConfig.general;
   const theme = accentColor && colorOverrides[accentColor] 
     ? { ...baseTheme, ...colorOverrides[accentColor] }
     : baseTheme;
@@ -330,14 +431,14 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 1. RESTAURANT CATEGORY
     // ----------------------------------------------------
-    if (category === 'restaurant') {
+    if (resolvedCategory === 'restaurant' || resolvedCategory === 'cafe') {
       const items = industryDetails?.menuItems?.length > 0 ? industryDetails.menuItems : [
         { name: "Artisanal Brew & Organic Espresso", price: "$4.99", desc: "Crafted using custom hand-selected premium beans roasted weekly." },
         { name: "Wildflower Honey Pastry", price: "$6.50", desc: "Fresh house-baked dough glazed with pure organic local honey." },
         { name: "Avocado Sourdough Board", price: "$12.00", desc: "Toasted country sourdough topped with mashed avocado, olive oil, and herbs." }
       ];
       const staff = industryDetails?.teamMembers?.length > 0 ? industryDetails.teamMembers : [
-        { name: "Chef Marcus Vance", role: "Head Culinary Artist" }
+        { name: resolvedCategory === 'cafe' ? "Alex Rivera" : "Chef Marcus Vance", role: resolvedCategory === 'cafe' ? "Master Barista" : "Head Culinary Artist" }
       ];
 
       // Variant 1: Trust-focused Local (badges, stars, local ticks)
@@ -528,7 +629,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 2. SALON CATEGORY
     // ----------------------------------------------------
-    if (category === 'salon') {
+    if (resolvedCategory === 'salon') {
       const items = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "Haircut & Luxury Blowout", price: "$65", features: ["Consultation & Guide", "Scalp Conditioning", "Professional Styling"] },
         { name: "Signature Hair Color & Highlights", price: "$145", features: ["Full Balayage", "Custom Toning Treatment", "Deep Hydration Mask"] },
@@ -701,7 +802,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 3. REPAIR SHOP CATEGORY
     // ----------------------------------------------------
-    if (category === 'repair_shop') {
+    if (resolvedCategory === 'mobile_repair') {
       const pricing = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "Glass/Screen Replacement", price: "Starts at $79", features: ["OEM Quality Glass", "1-Hour Turnaround", "90-Day Warranty"] },
         { name: "Premium Battery Service", price: "Starts at $49", features: ["New High-Capacity Cell", "Full Diagnostic Check", "Safe Battery Recycle"] },
@@ -869,7 +970,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 4. ELECTRONICS STORE CATEGORY
     // ----------------------------------------------------
-    if (category === 'electronics_store') {
+    if (resolvedCategory === 'electronics_store') {
       const products = industryDetails?.products?.length > 0 ? industryDetails.products : [
         { name: "Pro Sound Wireless Headphones", price: "$189.99", desc: "Active noise-cancellation with premium audio acoustics." },
         { name: "Smart Fitness Watch Sport Edition", price: "$249.00", desc: "Waterproof GPS tracker with integrated health monitoring." },
@@ -995,7 +1096,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 5. GYM / FITNESS CATEGORY
     // ----------------------------------------------------
-    if (category === 'gym') {
+    if (resolvedCategory === 'gym') {
       const plans = industryDetails?.pricingTiers?.length > 0 ? industryDetails.pricingTiers : [
         { name: "General Access Membership", price: "$39/mo", features: ["Full Gym Floor Access", "Locker Room & Showers", "Free Fitness Evaluation"] },
         { name: "Elite Coaching Membership", price: "$79/mo", features: ["All Gym Floor Access", "Uncapped Fitness Classes", "1x Monthly Private Training", "Custom Diet Schedule"] }
@@ -1143,7 +1244,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 6. CLINIC CATEGORY
     // ----------------------------------------------------
-    if (category === 'clinic') {
+    if (resolvedCategory === 'clinic') {
       const doctors = industryDetails?.teamMembers?.length > 0 ? industryDetails.teamMembers : [
         { name: "Dr. Catherine Howard", role: "Chief Pediatric Consultant" }
       ];
@@ -1250,7 +1351,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 7. COACHING CATEGORY
     // ----------------------------------------------------
-    if (category === 'coaching') {
+    if (resolvedCategory === 'coaching_center') {
       const courses = services?.length > 0 ? services : [
         { name: "Advanced Physics & Mechanics", desc: "Detailed breakdown of mechanics, electromagnetic theory, and concept applications." },
         { name: "Core Mathematics & Algebra", desc: "Specialized math tutoring designed to clarify foundations and speed up problems." },
@@ -1410,7 +1511,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     // ----------------------------------------------------
     // 8. RETAIL STORE CATEGORY
     // ----------------------------------------------------
-    if (category === 'retail_store') {
+    if (resolvedCategory === 'retail_store') {
       const items = industryDetails?.products?.length > 0 ? industryDetails.products : [
         { name: "Modern Linen Summer Set", price: "$89.99", desc: "100% pure organic breathable linen, styled for comfort." },
         { name: "Artisanal Crafted Leather Boots", price: "$149.00", desc: "Hand-stitched leather boots with comfortable cushioned soles." },
@@ -1534,8 +1635,303 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     }
 
     // ----------------------------------------------------
+    // TRADES CATEGORIES (plumbing, electrician, hvac, home_services)
+    // ----------------------------------------------------
+    if (resolvedCategory === 'plumbing' || resolvedCategory === 'electrician' || resolvedCategory === 'hvac' || resolvedCategory === 'home_services') {
+      const items = services?.length > 0 ? services : [
+        { name: "Emergency Dispatch & Repair", desc: "Fast response troubleshooting and restoration for urgent faults." },
+        { name: "Full System Installation", desc: "Professional setup of certified hardware and pipelines." },
+        { name: "Routine Maintenance & Audit", desc: "Detailed diagnostic inspections to prevent future service breakdowns." }
+      ];
+      
+      const details = {
+        plumbing: { title: "Plumbing Service Area & Rates", emergency: "24/7 Leak & Drain Clean Callouts", cert: "Wrench Certified Master Plumbers" },
+        electrician: { title: "Electrical Safety & Wiring", emergency: "Immediate Power Failure Response", cert: "Licensed Electricians & Wiring Audits" },
+        hvac: { title: "Climate & Air Ventilation Systems", emergency: "Same-Day Heating & AC Troubleshooting", cert: "EPA Certified Air Quality Technicians" },
+        home_services: { title: "Professional Handyman Home Care", emergency: "Prompt Home Maintenance & Fixes", cert: "Certified Handyman Teams & Guaranteed Care" }
+      }[resolvedCategory] || { title: "Service Areas & Packages", emergency: "Prompt Emergency Callout Services", cert: "Fully Licensed Local Experts" };
+
+      if (variant === 1) {
+        return (
+          <div className="space-y-6 text-left">
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-between gap-4">
+              <div>
+                <h4 className="font-bold text-xs uppercase tracking-wider">{details.emergency}</h4>
+                <p className="text-[10px] opacity-80 mt-1">Average response time under 45 minutes in local sectors.</p>
+              </div>
+              <Phone className="w-5 h-5 animate-bounce flex-shrink-0" />
+            </div>
+            <div className="space-y-4">
+              <h3 className="font-bold text-lg uppercase pl-3 border-l-4 border-emerald-500">Service Commitments</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {items.map((item, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-2`}>
+                    <h4 className="font-bold text-xs sm:text-sm">{item.name}</h4>
+                    <p className="text-[10px] opacity-75">{item.desc}</p>
+                    <div className="text-[9px] text-emerald-650 font-bold border-t border-slate-100 dark:border-slate-800 pt-2">
+                      {details.cert}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 2) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left items-start">
+            <div className="md:col-span-7 space-y-4">
+              <h3 className="text-lg font-bold uppercase text-slate-700 dark:text-slate-300">{details.title}</h3>
+              <div className="space-y-3">
+                {items.map((item, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg ${theme.cardBg} flex justify-between items-center gap-4`}>
+                    <div>
+                      <h4 className="font-bold text-xs">{item.name}</h4>
+                      <p className="text-[10px] opacity-70 mt-0.5">{item.desc}</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(item.name);
+                        document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className={`px-3 py-1.5 min-h-[30px] rounded text-[10px] font-bold text-white flex-shrink-0 ${theme.accentBg}`}
+                    >
+                      Book Fast Slot
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-5 bg-black/5 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-4">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Quick Booking Form</h4>
+              {bookingSubmitted ? (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded text-center text-xs font-bold">
+                  Callback slot booked! A technician will call in 15 minutes.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+                  <input type="tel" placeholder="Phone Number" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+                  <button 
+                    onClick={() => setBookingSubmitted(true)}
+                    className={`w-full py-2 min-h-[38px] rounded text-xs font-bold text-white ${theme.accentBg}`}
+                  >
+                    Confirm Callback
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left">
+            <div className="p-6 bg-black/5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center">
+              <Wrench className="w-10 h-10 text-indigo-550 flex-shrink-0" />
+              <div className="space-y-2">
+                <h4 className="font-bold text-sm">Our Local Craftsmanship Commitment</h4>
+                <p className="text-xs opacity-75 leading-relaxed font-light font-sans">We started with a simple belief: clean, honest trade services done right the first time. Our crew members live locally, hold master credentials, and treat your home with the care it deserves.</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-base uppercase tracking-wider font-light text-center">Bespoke Solutions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans text-xs">
+                {items.map((item, idx) => (
+                  <div key={idx} className="space-y-2">
+                    <h4 className="font-bold uppercase tracking-wide border-b border-current pb-1 border-opacity-10">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-8 font-serif max-w-2xl mx-auto text-left text-xs">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Bespoke Diagnostics</span>
+              <h3 className="text-xl font-light text-slate-800 dark:text-slate-200">Custom Engineering Tariffs</h3>
+            </div>
+            <div className="space-y-4 font-sans text-xs">
+              {items.map((item, idx) => (
+                <div key={idx} className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span>{item.name}</span>
+                  <span className="font-bold text-[#8b5a2b]">{details.cert}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] text-indigo-400 font-bold">Technician Service Matrix</span>
+              <h3 className="text-2xl font-black mt-1">High-Impact Trade Operations</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="inline-block bg-indigo-500/10 text-indigo-400 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">Certified</span>
+                    </div>
+                    <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // ----------------------------------------------------
+    // PROFESSIONAL SERVICES CATEGORY (professional_services)
+    // ----------------------------------------------------
+    if (resolvedCategory === 'professional_services') {
+      const items = services?.length > 0 ? services : [
+        { name: "Strategic Business Consulting", desc: "Diagnostic assessments, process improvement plans, and operational alignment reviews." },
+        { name: "Financial Risk & Advisory", desc: "Detailed audits, budget forecasting models, and customized tax optimization charts." },
+        { name: "Executive Leadership Training", desc: "Mentorship modules, talent assessment strategies, and team growth workshops." }
+      ];
+
+      if (variant === 1) {
+        return (
+          <div className="space-y-6 text-left">
+            <div className="text-left border-l-4 border-slate-700 pl-3">
+              <span className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Verified Corporate Solutions</span>
+              <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Management Consulting Services</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-4 rounded-xl ${theme.cardBg} space-y-2`}>
+                  <h4 className="font-bold text-xs sm:text-sm">{item.name}</h4>
+                  <p className="text-[10px] opacity-75">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 2) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left items-start">
+            <div className="md:col-span-7 space-y-4">
+              <h3 className="text-lg font-bold uppercase text-slate-700 dark:text-slate-300">Request A Free Strategy Assessment</h3>
+              <div className="space-y-3">
+                {items.map((item, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg ${theme.cardBg} flex justify-between items-center gap-4`}>
+                    <div>
+                      <h4 className="font-bold text-xs">{item.name}</h4>
+                      <p className="text-[10px] opacity-70 mt-0.5">{item.desc}</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(item.name);
+                        document.getElementById("lead-form")?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className={`px-3 py-1.5 min-h-[30px] rounded text-[10px] font-bold text-white flex-shrink-0 ${theme.accentBg}`}
+                    >
+                      Book Consultation
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="md:col-span-5 bg-black/5 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-4">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">Contact Advisers</h4>
+              {bookingSubmitted ? (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded text-center text-xs font-bold animate-pulse">
+                  Strategy call requested! We will call you shortly.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <input type="text" placeholder="Your Name" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+                  <input type="email" placeholder="Your Corporate Email" className="w-full bg-white dark:bg-slate-900 border border-slate-350 dark:border-slate-850 rounded px-2.5 py-1.5 text-xs text-inherit focus:outline-none" />
+                  <button 
+                    onClick={() => setBookingSubmitted(true)}
+                    className={`w-full py-2 min-h-[38px] rounded text-xs font-bold text-white ${theme.accentBg}`}
+                  >
+                    Get Strategy Proposal
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 3) {
+        return (
+          <div className="space-y-8 text-left">
+            <div className="p-6 bg-black/5 rounded-2xl flex flex-col sm:flex-row gap-4 items-center">
+              <Briefcase className="w-10 h-10 text-slate-550 flex-shrink-0" />
+              <div className="space-y-2">
+                <h4 className="font-bold text-sm">Our Advisory Mission</h4>
+                <p className="text-xs opacity-75 leading-relaxed font-light font-sans">We partner with businesses to unlock scalable potential. By diagnosing structural inefficiencies, designing custom roadmaps, and providing hands-on training, we turn growth goals into clear, predictable realities.</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 4) {
+        return (
+          <div className="space-y-8 font-serif max-w-2xl mx-auto text-left text-xs">
+            <div className="text-center space-y-1">
+              <span className="text-[9px] uppercase tracking-[0.3em] font-sans text-slate-500 block">Executive Selection</span>
+              <h3 className="text-xl font-light text-slate-800 dark:text-slate-200">Consultation Directory</h3>
+            </div>
+            <div className="space-y-4 font-sans text-xs">
+              {items.map((item, idx) => (
+                <div key={idx} className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <span>{item.name}</span>
+                  <span className="font-bold">Bespoke Review</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (variant === 5) {
+        return (
+          <div className="space-y-6 text-left">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.25em] text-slate-500 font-bold">Solutions Catalog</span>
+              <h3 className="text-2xl font-black mt-1">Strategic Operations</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-sans">
+              {items.map((item, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden transition-all duration-300 hover:shadow-lg ${theme.cardBg} flex flex-col justify-between`}>
+                  <div className="space-y-3">
+                    <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100">{item.name}</h4>
+                    <p className="text-[10px] opacity-75 font-light leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    // ----------------------------------------------------
     // 9. GENERAL BUSINESS / FALLBACK
     // ----------------------------------------------------
+
     // We render standard capabilities matching the variant concept
     if (variant === 1) {
       return (
@@ -1663,6 +2059,31 @@ export default function TemplateRenderer({ data, variant = 1 }) {
     );
   };
 
+  const renderPhotoGallery = () => {
+    const photos = uploadedImages.products || [];
+    if (photos.length === 0) return null;
+
+    return (
+      <div className="space-y-6 py-6 font-sans">
+        <div className="text-left border-l-4 border-current pl-3">
+          <span className="text-[9px] uppercase tracking-wider font-bold opacity-60">Gallery & Showcase</span>
+          <h3 className={`text-xl font-bold uppercase tracking-tight ${theme.fontDisplay}`}>Product & Service Photos</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {photos.map((photo, index) => (
+            <div key={index} className="aspect-video sm:aspect-square rounded-2xl overflow-hidden border border-current border-opacity-10 shadow-sm relative group bg-black/5">
+              <img 
+                src={photo} 
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                alt={`Showcase photo ${index + 1}`} 
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // ----------------------------------------------------
   // VARIANT 1: Basic & Functional (Stacked clean layout)
   // ----------------------------------------------------
@@ -1674,7 +2095,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           
           {/* Navigation */}
           <div className="flex justify-between items-center pb-6 border-b border-slate-200 dark:border-slate-800 gap-4">
-            <h2 className="text-xl font-bold tracking-tight truncate">{businessName}</h2>
+            {renderLogoAndName("text-xl font-bold tracking-tight truncate")}
             <div className="flex-shrink-0">
               <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded text-xs font-bold transition-all ${theme.accentBg}`}>
                 Call Now
@@ -1719,6 +2140,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Industry specific sections */}
           {renderIndustrySections()}
 
+          {/* Uploaded Gallery */}
+          {renderPhotoGallery()}
+
           {/* Testimonials */}
           {renderTestimonials()}
 
@@ -1761,8 +2185,8 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Navigation */}
           <div className="flex justify-between items-center gap-4">
             <div className="flex items-center gap-2 min-w-0">
-              <BadgeIcon className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-              <h2 className="text-lg font-bold tracking-tight truncate">{businessName}</h2>
+              {!uploadedImages.logo && <BadgeIcon className="w-5 h-5 text-indigo-500 flex-shrink-0" />}
+              {renderLogoAndName("text-lg font-bold tracking-tight truncate")}
             </div>
             <div className="flex items-center gap-4 text-xs font-semibold flex-shrink-0">
               <span className="opacity-75 hidden sm:inline">{hours}</span>
@@ -1832,6 +2256,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Industry content */}
           {renderIndustrySections()}
 
+          {/* Uploaded Gallery */}
+          {renderPhotoGallery()}
+
           {/* Testimonials */}
           {renderTestimonials()}
 
@@ -1885,10 +2312,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Header */}
           <div className="flex justify-between items-center relative z-10 gap-4">
             <div className="flex items-center gap-2 min-w-0">
-              <div className={`p-1.5 rounded-lg ${theme.accentText} bg-opacity-10 bg-current flex-shrink-0`}>
-                <BadgeIcon className="w-4 h-4" />
-              </div>
-              <span className="font-bold tracking-wider uppercase text-xs truncate">{businessName}</span>
+              {!uploadedImages.logo && (
+                <div className={`p-1.5 rounded-lg ${theme.accentText} bg-opacity-10 bg-current flex-shrink-0`}>
+                  <BadgeIcon className="w-4 h-4" />
+                </div>
+              )}
+              {renderLogoAndName("font-bold tracking-wider uppercase text-xs truncate")}
             </div>
             <div className="flex-shrink-0">
               <a href={`tel:${phone}`} className={`px-4 py-2 min-h-[44px] flex items-center justify-center rounded-xl text-xs font-semibold transition-all ${theme.accentBg}`}>
@@ -1934,6 +2363,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Industry sections */}
           {renderIndustrySections()}
 
+          {/* Uploaded Gallery */}
+          {renderPhotoGallery()}
+
           {/* Testimonials */}
           {renderTestimonials()}
 
@@ -1976,7 +2408,7 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           
           {/* Luxury Logo */}
           <div className="space-y-2">
-            <h2 className="text-3xl font-light uppercase tracking-[0.2em] break-words">{businessName}</h2>
+            {renderLogoAndName("text-3xl font-light uppercase tracking-[0.2em] break-words", "flex items-center gap-2 min-w-0 justify-center")}
             <div className="w-16 h-0.5 bg-current mx-auto opacity-30" />
           </div>
 
@@ -2016,6 +2448,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
 
           {/* Industry details */}
           {renderIndustrySections()}
+
+          {/* Uploaded Gallery */}
+          {renderPhotoGallery()}
 
           {/* Testimonials */}
           {renderTestimonials()}
@@ -2060,10 +2495,12 @@ export default function TemplateRenderer({ data, variant = 1 }) {
           {/* Navigation */}
           <header className="flex justify-between items-center relative z-10 gap-4">
             <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.accentBg}`}>
-                <BadgeIcon className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold tracking-tight text-lg truncate">{businessName}</span>
+              {!uploadedImages.logo && (
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.accentBg}`}>
+                  <BadgeIcon className="w-4 h-4 text-white" />
+                </div>
+              )}
+              {renderLogoAndName("font-bold tracking-tight text-lg truncate")}
             </div>
             <div className="flex-shrink-0">
               <a href={`tel:${phone}`} className={`px-5 py-2.5 min-h-[44px] flex items-center justify-center rounded-xl font-bold text-sm tracking-tight transition-transform hover:-translate-y-0.5 ${theme.accentBg}`}>
@@ -2129,6 +2566,9 @@ export default function TemplateRenderer({ data, variant = 1 }) {
 
           {/* Industry specific sections */}
           {renderIndustrySections()}
+
+          {/* Uploaded Gallery */}
+          {renderPhotoGallery()}
 
           {/* Testimonials */}
           {renderTestimonials()}
