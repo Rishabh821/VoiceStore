@@ -136,76 +136,89 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
     }
   }, []);
 
-  // Initialize SpeechRecognition
+  // Check SpeechRecognition support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setSpeechSupported(false);
     } else {
-      const rec = new SpeechRecognition();
-      rec.continuous = true;
-      rec.interimResults = true;
-      rec.lang = 'en-US';
-
-      rec.onresult = (event) => {
-        let sessionTranscript = '';
-        for (let i = 0; i < event.results.length; ++i) {
-          sessionTranscript += event.results[i][0].transcript;
-        }
-        
-        const base = baseTextRef.current.trim() ? baseTextRef.current.trim() + " " : "";
-        setDescription(base + sessionTranscript);
-      };
-
-      rec.onerror = (event) => {
-        console.error("Speech Error:", event);
-        console.error("Speech Recognition full error event details:", event.error, event);
-
-        const errorDescriptions = {
-          'not-allowed': "Microphone permission was denied by user or system.",
-          'network': "Network communication failure occurred.",
-          'audio-capture': "No audio capture device found or microphone is busy.",
-          'no-speech': "No speech was detected by the microphone.",
-          'service-not-allowed': "Speech recognition service is not allowed by this browser."
-        };
-
-        const details = errorDescriptions[event.error] || "An unrecognized speech error occurred.";
-        setSpeechError(`[Code: ${event.error}] ${details}`);
-        setIsListening(false);
-      };
-
-      rec.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = rec;
+      setSpeechSupported(true);
     }
-
-    return () => {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {}
-      }
-    };
   }, []);
 
   const toggleListening = () => {
     if (!speechSupported) return;
 
     if (isListening) {
-      recognitionRef.current.stop();
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {}
+        recognitionRef.current = null;
+      }
       setIsListening(false);
     } else {
       setSpeechError("");
       baseTextRef.current = description;
+      
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
+
       try {
-        recognitionRef.current.start();
+        const rec = new SpeechRecognition();
+        rec.continuous = true;
+        rec.interimResults = true;
+        rec.lang = 'en-US';
+
+        rec.onresult = (event) => {
+          // Guard: ignore results if this instance is no longer the active session
+          if (recognitionRef.current !== rec) return;
+
+          let sessionTranscript = '';
+          for (let i = 0; i < event.results.length; ++i) {
+            const text = event.results[i][0].transcript;
+            if (sessionTranscript && !sessionTranscript.endsWith(' ') && !text.startsWith(' ')) {
+              sessionTranscript += ' ';
+            }
+            sessionTranscript += text;
+          }
+          
+          const base = baseTextRef.current.trim() ? baseTextRef.current.trim() + " " : "";
+          setDescription(base + sessionTranscript);
+        };
+
+        rec.onerror = (event) => {
+          if (recognitionRef.current !== rec) return;
+          console.error("Speech Error:", event);
+
+          const errorDescriptions = {
+            'not-allowed': "Microphone permission was denied by user or system.",
+            'network': "Network communication failure occurred.",
+            'audio-capture': "No audio capture device found or microphone is busy.",
+            'no-speech': "No speech was detected by the microphone.",
+            'service-not-allowed': "Speech recognition service is not allowed by this browser."
+          };
+
+          const details = errorDescriptions[event.error] || "An unrecognized speech error occurred.";
+          setSpeechError(`[Code: ${event.error}] ${details}`);
+          setIsListening(false);
+          recognitionRef.current = null;
+        };
+
+        rec.onend = () => {
+          if (recognitionRef.current !== rec) return;
+          setIsListening(false);
+          recognitionRef.current = null;
+        };
+
+        recognitionRef.current = rec;
+        rec.start();
         setIsListening(true);
       } catch (err) {
         console.error("Failed to start speech recognition:", err);
         setSpeechError("[Code: start-failed] Could not initialize voice input.");
         setIsListening(false);
+        recognitionRef.current = null;
       }
     }
   };
@@ -215,6 +228,7 @@ export default function InputPage({ onBack, onGenerate, error, onClearError }) {
       try {
         recognitionRef.current.stop();
       } catch (e) {}
+      recognitionRef.current = null;
       setIsListening(false);
     }
 
